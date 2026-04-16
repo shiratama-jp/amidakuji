@@ -221,7 +221,7 @@ canvas { display: block; margin: 0 auto; border-radius: 12px; max-width: 100%; h
 
 <!-- あみだ本体 -->
 <div id="amida-wrap">
-  <div class="card" style="padding:1rem;">
+  <div class="card" id="ctrl-card" style="padding:1rem;transition:all 0.4s ease;">
     <div class="hint" id="hint-text">スタート地点をえらんでね！</div>
     <div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:0.8rem;">
       <span style="font-size:1rem;">🐢</span>
@@ -415,18 +415,39 @@ document.getElementById('close-btn').addEventListener('click', () => {
 });
 
 // ===== あみだ初期化 =====
+function fitCanvas() {
+  // 画面サイズに合わせてcanvasを計算
+  const vw = Math.min(580, window.innerWidth - 24);
+  const ctrlH = document.getElementById('ctrl-card') ? document.getElementById('ctrl-card').offsetHeight : 0;
+  const promptH = document.getElementById('player-prompt').offsetHeight || 0;
+  const headerH = document.querySelector('h1') ? document.querySelector('h1').offsetHeight + 40 : 80;
+  const padding = 80;
+  const availH = window.innerHeight - headerH - ctrlH - promptH - padding;
+  const targetH = Math.max(300, Math.min(600, availH));
+
+  // ROW_Hをtargetに合わせてスケール
+  const scale = targetH / (VPAD * 2 + ROW_H * ROWS + 80);
+  const scaledRowH = Math.floor(ROW_H * scale);
+  const scaledVpad = Math.floor(VPAD * scale);
+
+  canvasW = Math.min(vw, Math.max(N * 70 + HPAD * 2, 280));
+  canvasH = scaledVpad * 2 + scaledRowH * ROWS + 80;
+  canvas.width = canvasW; canvas.height = canvasH;
+
+  // グローバルにスケール済みの値を反映
+  window._scaledRowH = scaledRowH;
+  window._scaledVpad = scaledVpad;
+
+  const span = canvasW - HPAD * 2;
+  colX = [];
+  for (let i = 0; i < N; i++) colX.push(HPAD + (span / (N - 1)) * i);
+}
+
 function startAmida() {
   assignments = new Array(N).fill(null);
   hbars = []; phase = 'assign'; animating = false;
 
-  const maxW = Math.min(580, (document.getElementById('amida-card').clientWidth || window.innerWidth) - 16);
-  canvasW = Math.min(maxW, Math.max(N * 90 + HPAD * 2, 300));
-  canvasH = VPAD * 2 + ROW_H * ROWS + 80;
-  canvas.width = canvasW; canvas.height = canvasH;
-  const span = canvasW - HPAD * 2;
-  colX = [];
-  for (let i = 0; i < N; i++) colX.push(HPAD + (span / (N - 1)) * i);
-
+  fitCanvas();
   document.getElementById('amida-wrap').style.display = 'block';
   document.getElementById('result-card').style.display = 'none';
   document.getElementById('result-card').classList.remove('visible');
@@ -537,19 +558,41 @@ document.getElementById('quick-btn').addEventListener('click', () => {
 document.getElementById('go-btn').addEventListener('click', () => {
   if (animating) return;
   if (isKidsMode && phase === 'assign') {
-    // こどもモード：横線生成してそのままスタート
+    // こどもモード：ボタンエリアを非表示にしてからスタート
     generateHbars();
     phase = 'running'; animating = true;
-    document.getElementById('go-btn').disabled = true;
     document.getElementById('go-btn').style.display = 'none';
-    seGo(() => animateAll(calcPaths()));
+    document.getElementById('player-prompt').style.display = 'none';
+    document.getElementById('hint-text').style.display = 'none';
+    const ctrl = document.getElementById('ctrl-card');
+    ctrl.style.opacity = '0';
+    ctrl.style.maxHeight = '0';
+    ctrl.style.padding = '0';
+    ctrl.style.marginBottom = '0';
+    ctrl.style.overflow = 'hidden';
+    // canvasを再フィット、コマを表示したままスタート
+    setTimeout(() => {
+      fitCanvas();
+      phase = 'ready'; // drawAmidaでアイコンを描くため一時的にreadyに
+      drawAmida();
+      phase = 'running';
+      seGo(() => animateAll(calcPaths()));
+    }, 400);
     return;
   }
   if (phase !== 'ready') return;
   phase = 'running'; animating = true;
   document.getElementById('go-btn').disabled = true;
   document.getElementById('regen-btn').disabled = true;
-  seGo(() => animateAll(calcPaths()));
+  // ボタンエリアをフェードアウト
+  const ctrl = document.getElementById('ctrl-card');
+  ctrl.style.opacity = '0';
+  ctrl.style.maxHeight = '0';
+  ctrl.style.padding = '0';
+  ctrl.style.marginBottom = '0';
+  ctrl.style.overflow = 'hidden';
+  document.getElementById('player-prompt').style.display = 'none';
+  setTimeout(() => { fitCanvas(); phase = 'ready'; drawAmida(); phase = 'running'; seGo(() => animateAll(calcPaths())); }, 400);
 });
 
 function generateHbars() {
@@ -578,13 +621,15 @@ function isValidHbars() {
 
 function calcPaths() {
   const paths = [];
+  const _RH = window._scaledRowH || ROW_H;
+  const _VP = window._scaledVpad || VPAD;
   for (let i = 0; i < N; i++) {
     const personIdx = assignments[i];
     if (personIdx === null) continue;
     let col = i;
-    const path = [{x: colX[col], y: VPAD*0.5}];
+    const path = [{x: colX[col], y: _VP*0.5}];
     for (let row = 0; row < ROWS; row++) {
-      const y0 = VPAD + row * ROW_H;
+      const y0 = _VP + row * _RH;
       path.push({x: colX[col], y: y0});
       const right = hbars.find(h=>h.col===col&&h.row===row);
       const left  = hbars.find(h=>h.col===col-1&&h.row===row);
@@ -649,15 +694,17 @@ function animateAll(paths) {
 }
 
 function drawAmida() {
+  const _RH = window._scaledRowH || ROW_H;
+  const _VP = window._scaledVpad || VPAD;
   ctx.clearRect(0, 0, canvasW, canvasH);
-  const topY=VPAD*0.5, bottomY=VPAD+ROWS*ROW_H;
+  const topY=_VP*0.5, bottomY=_VP+ROWS*_RH;
 
   for (let i=0; i<N; i++) {
     ctx.beginPath(); ctx.moveTo(colX[i],topY); ctx.lineTo(colX[i],bottomY);
     ctx.strokeStyle='#d6c9ff'; ctx.lineWidth=4; ctx.lineCap='round'; ctx.stroke();
   }
   for (const {col,row} of hbars) {
-    const y=VPAD+row*ROW_H;
+    const y=_VP+row*_RH;
     ctx.beginPath(); ctx.moveTo(colX[col],y); ctx.lineTo(colX[col+1],y);
     ctx.strokeStyle='#a29bfe'; ctx.lineWidth=4; ctx.lineCap='round'; ctx.stroke();
   }
@@ -786,8 +833,22 @@ document.getElementById('reset-btn').addEventListener('click', () => {
     document.getElementById('regen-btn').disabled=false;
   }
 
+  const ctrl = document.getElementById('ctrl-card');
+  ctrl.style.opacity = '';
+  ctrl.style.maxHeight = '';
+  ctrl.style.padding = '1rem';
+  ctrl.style.marginBottom = '';
+  ctrl.style.overflow = '';
+  document.getElementById('hint-text').style.display = '';
+  fitCanvas();
   updatePrompt();
   drawAmida();
+});
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('amida-wrap').style.display !== 'none') {
+    fitCanvas(); drawAmida();
+  }
 });
 </script>
 </body>
