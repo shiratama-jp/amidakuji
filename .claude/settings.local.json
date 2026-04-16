@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -lh \"d:/AmidakujiApp/\"*.png)",
+      "Bash(python -c \"from PIL import Image; img=Image.open\\('d:/AmidakujiApp/Gemini_Generated_Image_26p79f26p79f26p7.png'\\); print\\(img.size\\)\")",
+      "Bash(where magick:*)",
+      "Bash(where ffmpeg:*)",
+      "Bash(where pwsh:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m pip install Pillow)",
+      "Bash(python -c \"from PIL import Image; img=Image.open\\('d:/AmidakujiApp/Gemini_Generated_Image_26p79f26p79f26p7.png'\\); print\\(img.size, img.mode\\)\")",
+      "Bash(where python:*)",
+      "Bash(py -3 --version)",
+      "Bash(node -e \"console.log\\('node ok'\\)\")",
+      "Bash(npm install:*)"
+    ]
+  }
+}
