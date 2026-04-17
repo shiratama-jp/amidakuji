@@ -1,4 +1,4 @@
-const CACHE_NAME = 'amidakuji-v3';
+const CACHE_NAME = 'amidakuji-v4';
 const ASSETS = [
   './',
   './index.html',

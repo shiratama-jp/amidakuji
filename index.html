@@ -231,8 +231,7 @@ canvas { display: block; margin: 0 auto; border-radius: 12px; max-width: 100%; h
     </div>
     <div class="action-row">
       <button class="btn btn-adult" id="ready-btn" disabled>じゅんびOK！ ✨</button>
-      <button class="btn btn-quick" id="quick-btn">かんたんスタート ⚡</button>
-      <button class="btn btn-regen" id="regen-btn" style="display:none;">もういちど 🔀</button>
+      <button class="btn btn-regen" id="regen-btn" style="display:none;">あみだ再作成 🔀</button>
       <button class="btn btn-go" id="go-btn" style="display:none;">よーいドン！ 🚀</button>
     </div>
   </div>
@@ -453,16 +452,15 @@ function startAmida() {
   document.getElementById('result-card').classList.remove('visible');
   if (isKidsMode) {
     document.getElementById('ready-btn').style.display = 'none';
-    document.getElementById('quick-btn').style.display = 'none';
+
     document.getElementById('regen-btn').style.display = 'none';
     document.getElementById('go-btn').style.display = 'none';
     document.getElementById('go-btn').disabled = false;
   } else {
     document.getElementById('go-btn').style.display = 'none';
     document.getElementById('regen-btn').style.display = 'none';
-    document.getElementById('ready-btn').style.display = 'inline-block';
-    document.getElementById('ready-btn').disabled = true;
-    document.getElementById('quick-btn').style.display = 'inline-block';
+    document.getElementById('ready-btn').style.display = 'none';
+
   }
 
   updatePrompt();
@@ -478,7 +476,12 @@ function updatePrompt() {
       document.getElementById('hint-text').textContent = 'ぜんいんきまった！「よーいドン！」をおしてね！';
       document.getElementById('go-btn').style.display = 'inline-block';
     } else {
-      document.getElementById('hint-text').textContent = 'ぜんいんきまった！「じゅんびOK」をおしてね！';
+      document.getElementById('hint-text').textContent = 'じゅんびOK！「よーいドン！」をおしてね！';
+      generateHbars(); phase = 'ready';
+      document.getElementById('go-btn').style.display = 'inline-block';
+      document.getElementById('regen-btn').style.display = 'inline-block';
+  
+      drawAmida();
     }
     pp.style.display = 'none';
   } else {
@@ -488,7 +491,8 @@ function updatePrompt() {
       pp.innerHTML = `<span class="animal-big">${animal}</span>${animal}ちゃんは どこにする？`;
     } else {
       document.getElementById('hint-text').textContent = `✨ ${animal}さん スタート地点を選んでください`;
-      pp.innerHTML = `<strong>${animal}</strong>さん、スタート地点を選んでください`;
+      pp.innerHTML = `<strong>${animal}</strong>さん、スタート地点を選んでください<div style="margin-top:0.8rem;"><button class="btn btn-quick" id="quick-btn" style="font-size:0.95rem;padding:10px 24px;">自動選択 ⚡</button></div>`;
+      document.getElementById('quick-btn').addEventListener('click', quickBtnHandler);
     }
     pp.style.display = 'block';
   }
@@ -535,25 +539,24 @@ document.getElementById('ready-btn').addEventListener('click', () => {
 });
 
 document.getElementById('regen-btn').addEventListener('click', () => {
-  if (phase !== 'ready') return;
-  generateHbars(); drawAmida();
+  if (phase !== 'ready' && phase !== 'assign') return;
+  generateHbars(); phase = 'ready'; drawAmida();
 });
 
-document.getElementById('quick-btn').addEventListener('click', () => {
+function quickBtnHandler() {
   const shuffled = [...Array(N).keys()].sort(() => Math.random() - 0.5);
   assignments = new Array(N).fill(null);
   shuffled.forEach((personIdx, col) => { assignments[col] = personIdx; });
   generateHbars(); phase = 'ready';
   document.getElementById('ready-btn').style.display = 'none';
-  document.getElementById('quick-btn').style.display = 'none';
-  document.getElementById('regen-btn').style.display = 'inline-block';
+  document.getElementById('regen-btn').style.display = isKidsMode ? 'none' : 'inline-block';
   document.getElementById('go-btn').style.display = 'inline-block';
   document.getElementById('go-btn').disabled = false;
   document.getElementById('regen-btn').disabled = false;
   document.getElementById('player-prompt').style.display = 'none';
-  document.getElementById('hint-text').textContent = isKidsMode ? 'きにいらなければ「もういちど」！' : '気に入らなければ「再生成」！';
+  document.getElementById('hint-text').textContent = isKidsMode ? 'よーいドン！をおしてね！' : 'あみだ再作成もできるよ！';
   drawAmida();
-});
+}
 
 document.getElementById('go-btn').addEventListener('click', () => {
   if (animating) return;
@@ -822,13 +825,12 @@ document.getElementById('reset-btn').addEventListener('click', () => {
     document.getElementById('go-btn').disabled=false;
     document.getElementById('regen-btn').style.display='none';
     document.getElementById('ready-btn').style.display='none';
-    document.getElementById('quick-btn').style.display='none';
+    document.getElementById('quick-btn-wrap').style.display='none';
   } else {
     document.getElementById('go-btn').style.display='none';
     document.getElementById('regen-btn').style.display='none';
-    document.getElementById('ready-btn').style.display='inline-block';
-    document.getElementById('ready-btn').disabled=true;
-    document.getElementById('quick-btn').style.display='inline-block';
+    document.getElementById('ready-btn').style.display='none';
+    document.getElementById('quick-btn-wrap').style.display='none';
     document.getElementById('go-btn').disabled=false;
     document.getElementById('regen-btn').disabled=false;
   }
