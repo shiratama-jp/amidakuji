@@ -398,10 +398,21 @@ document.getElementById('setup-btn').addEventListener('click', () => {
     goalWrap.appendChild(gg);
     if (saved.names && saved.names[i]) document.getElementById(`name-${i}`).value = saved.names[i];
     if (saved.goals && saved.goals[i]) document.getElementById(`goal-${i}`).value = saved.goals[i];
+    document.getElementById(`name-${i}`).addEventListener('input', saveSettings);
+    document.getElementById(`goal-${i}`).addEventListener('input', saveSettings);
   }
   document.getElementById('step1-card').style.display = 'none';
   document.getElementById('step2-card').style.display = 'block';
 });
+
+function saveSettings() {
+  const savedNames = [], savedGoals = [];
+  for (let i = 0; i < N; i++) {
+    savedNames.push(document.getElementById(`name-${i}`)?.value || '');
+    savedGoals.push(document.getElementById(`goal-${i}`)?.value || '');
+  }
+  localStorage.setItem('amida-settings', JSON.stringify({ names: savedNames, goals: savedGoals }));
+}
 
 document.getElementById('clear-btn').addEventListener('click', () => {
   localStorage.removeItem('amida-settings');
@@ -830,20 +841,11 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   rc2.classList.remove('visible');
   rc2.style.display='none';
 
-  if (isKidsMode) {
-    document.getElementById('go-btn').style.display='none';
-    document.getElementById('go-btn').disabled=false;
-    document.getElementById('regen-btn').style.display='none';
-    document.getElementById('ready-btn').style.display='none';
-    document.getElementById('quick-btn-wrap').style.display='none';
-  } else {
-    document.getElementById('go-btn').style.display='none';
-    document.getElementById('regen-btn').style.display='none';
-    document.getElementById('ready-btn').style.display='none';
-    document.getElementById('quick-btn-wrap').style.display='none';
-    document.getElementById('go-btn').disabled=false;
-    document.getElementById('regen-btn').disabled=false;
-  }
+  document.getElementById('go-btn').style.display='none';
+  document.getElementById('go-btn').disabled=false;
+  document.getElementById('regen-btn').style.display='none';
+  document.getElementById('regen-btn').disabled=false;
+  document.getElementById('ready-btn').style.display='none';
 
   const ctrl = document.getElementById('ctrl-card');
   ctrl.style.opacity = '';
