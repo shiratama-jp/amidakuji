@@ -173,7 +173,7 @@ canvas { display: block; margin: 0 auto; border-radius: 12px; max-width: 100%; h
 <body>
 
 <h1>🎉 あみだくじ</h1>
-<div class="subtitle">Ver.260418-1.03</div>
+<div class="subtitle">Ver.260418-1.04</div>
 
 <!-- スタート画面 -->
 <div class="card" id="start-card">
@@ -230,9 +230,9 @@ canvas { display: block; margin: 0 auto; border-radius: 12px; max-width: 100%; h
 <!-- おとなモード STEP2 -->
 <div class="card" id="step2-card" style="display:none;">
   <div style="font-size:15px;font-weight:800;letter-spacing:0.15em;color:#a29bfe;margin-bottom:0.8rem;text-align:center;">STEP 2 — 名前とゴールを入力（空欄でもOK）</div>
-  <div style="font-size:16px;font-weight:800;color:#b2a8d8;margin-bottom:6px;text-align:center;">参加者の名前（最大4文字）</div>
+  <div style="font-size:16px;font-weight:800;color:#b2a8d8;margin-bottom:6px;text-align:center;">参加者の名前（最大4文字・絵文字OK）</div>
   <div id="name-inputs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:0.8rem;max-width:480px;margin-left:auto;margin-right:auto;"></div>
-  <div style="font-size:16px;font-weight:800;color:#b2a8d8;margin-bottom:6px;margin-top:1rem;text-align:center;">ゴールの内容（最大4文字）</div>
+  <div style="font-size:16px;font-weight:800;color:#b2a8d8;margin-bottom:6px;margin-top:1rem;text-align:center;">ゴールの内容（最大4文字・絵文字OK）</div>
   <div id="goal-inputs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:0.8rem;max-width:480px;margin-left:auto;margin-right:auto;"></div>
   <div class="action-row">
     <button class="btn btn-go" id="close-btn">参加締め切り 🎯</button>
@@ -396,6 +396,12 @@ document.getElementById('ninzu-ok-btn').addEventListener('click', () => {
 });
 
 // ===== おとなモード STEP1 =====
+// 保存された人数を復元
+(function() {
+  const saved = JSON.parse(localStorage.getItem('amida-settings') || '{}');
+  if (saved.count) document.getElementById('num-input').value = saved.count;
+})();
+
 document.getElementById('setup-btn').addEventListener('click', () => {
   N = Math.max(2, Math.min(8, parseInt(document.getElementById('num-input').value) || 4));
   const defaultNames = 'ABCDEFGH';
@@ -428,7 +434,7 @@ function saveSettings() {
     savedNames.push(document.getElementById(`name-${i}`)?.value || '');
     savedGoals.push(document.getElementById(`goal-${i}`)?.value || '');
   }
-  localStorage.setItem('amida-settings', JSON.stringify({ names: savedNames, goals: savedGoals }));
+  localStorage.setItem('amida-settings', JSON.stringify({ count: N, names: savedNames, goals: savedGoals }));
 }
 
 document.getElementById('clear-btn').addEventListener('click', () => {
