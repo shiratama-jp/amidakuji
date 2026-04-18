@@ -180,6 +180,13 @@ canvas { display: block; margin: 0 auto; border-radius: 12px; max-width: 100%; h
   </div>
 </div>
 
+<!-- インストール案内 -->
+<div id="install-banner" style="display:none;text-align:center;margin-top:0.5rem;margin-bottom:0.5rem;max-width:600px;margin-left:auto;margin-right:auto;">
+  <div style="display:inline-block;background:linear-gradient(135deg,#e8f8f0,#d4f5e4);border-radius:16px;padding:0.8rem 1.2rem;box-shadow:0 4px 16px rgba(16,172,132,0.15);border:2px solid #b8e8d0;">
+    <div id="install-content"></div>
+  </div>
+</div>
+
 <!-- QRコードエリア -->
 <div id="qr-area" style="text-align:center;margin-top:0.5rem;margin-bottom:1rem;">
   <div style="display:inline-block;background:white;border-radius:16px;padding:1rem 1.5rem;box-shadow:0 4px 16px rgba(100,80,180,0.12);">
@@ -868,6 +875,46 @@ window.addEventListener('resize', () => {
     fitCanvas(); drawAmida();
   }
 });
+
+// ===== インストール案内 =====
+(function() {
+  const banner = document.getElementById('install-banner');
+  const content = document.getElementById('install-content');
+
+  // アプリとして起動中なら何も表示しない
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  let deferredPrompt = null;
+
+  if (isIOS) {
+    // iOS: テキスト案内のみ
+    content.innerHTML = '<div style="font-size:0.95rem;font-weight:900;color:#10ac84;margin-bottom:0.3rem;">📲 アプリとして使えるよ！</div>'
+      + '<div style="font-size:0.8rem;color:#6c5ce7;line-height:1.6;">下の <strong>共有ボタン（□↑）</strong>から<br><strong>「ホーム画面に追加」</strong>をタップしてね</div>';
+    banner.style.display = 'block';
+  } else {
+    // Android / PC: インストールボタン
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      content.innerHTML = '<div style="font-size:0.95rem;font-weight:900;color:#10ac84;margin-bottom:0.5rem;">📲 アプリとして使えるよ！</div>'
+        + '<button id="install-btn" style="font-family:Zen Maru Gothic,sans-serif;font-weight:900;font-size:1rem;padding:10px 28px;border-radius:100px;border:none;cursor:pointer;background:linear-gradient(135deg,#10ac84,#54c7ec);color:white;box-shadow:0 4px 14px rgba(16,172,132,0.35);">インストール 🎉</button>';
+      banner.style.display = 'block';
+
+      document.getElementById('install-btn').addEventListener('click', () => {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(result => {
+          if (result.outcome === 'accepted') banner.style.display = 'none';
+          deferredPrompt = null;
+        });
+      });
+    });
+
+    window.addEventListener('appinstalled', () => {
+      banner.style.display = 'none';
+    });
+  }
+})();
 </script>
 </body>
 </html>
