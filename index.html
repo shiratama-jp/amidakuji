@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>あみだくじ（こどもむけ）</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#a29bfe">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="あみだくじ">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
 <style>
 :root { --bg: #fff5e6; --shadow: rgba(100,80,180,0.15); }
@@ -167,7 +173,7 @@ canvas { display: block; margin: 0 auto; border-radius: 12px; max-width: 100%; h
 <body>
 
 <h1>🎉 あみだくじ</h1>
-<div class="subtitle">Ver.260418-1.01</div>
+<div class="subtitle">Ver.260418-1.02</div>
 
 <!-- スタート画面 -->
 <div class="card" id="start-card">
@@ -930,6 +936,11 @@ window.addEventListener('resize', () => {
     });
   }
 })();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
 </script>
 </body>
 </html>
