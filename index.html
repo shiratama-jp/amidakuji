@@ -167,7 +167,7 @@ canvas { display: block; margin: 0 auto; border-radius: 12px; max-width: 100%; h
 <body>
 
 <h1>🎉 あみだくじ</h1>
-<div class="subtitle">Ver.260418-1.00</div>
+<div class="subtitle">Ver.260418-1.01</div>
 
 <!-- スタート画面 -->
 <div class="card" id="start-card">
@@ -351,6 +351,7 @@ function seResult() {
 document.getElementById('kids-btn').addEventListener('click', () => {
   isKidsMode = true;
   document.getElementById('qr-area').style.display = 'none';
+  document.getElementById('install-banner').style.display = 'none';
   document.getElementById('start-card').style.display = 'none';
   document.getElementById('ninzu-card').style.display = 'block';
   seClick();
@@ -359,6 +360,7 @@ document.getElementById('kids-btn').addEventListener('click', () => {
 document.getElementById('adult-btn').addEventListener('click', () => {
   isKidsMode = false;
   document.getElementById('qr-area').style.display = 'none';
+  document.getElementById('install-banner').style.display = 'none';
   document.getElementById('start-card').style.display = 'none';
   document.getElementById('step1-card').style.display = 'block';
   seClick();
@@ -887,16 +889,26 @@ window.addEventListener('resize', () => {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   let deferredPrompt = null;
 
-  if (isIOS) {
-    // iOS: テキスト案内のみ
-    content.innerHTML = '<div style="font-size:0.95rem;font-weight:900;color:#10ac84;margin-bottom:0.3rem;">📲 アプリとして使えるよ！</div>'
-      + '<div style="font-size:0.8rem;color:#6c5ce7;line-height:1.6;">下の <strong>共有ボタン（□↑）</strong>から<br><strong>「ホーム画面に追加」</strong>をタップしてね</div>';
+  function showTextGuide() {
+    if (isIOS) {
+      content.innerHTML = '<div style="font-size:0.95rem;font-weight:900;color:#10ac84;margin-bottom:0.3rem;">📲 アプリとして使えるよ！</div>'
+        + '<div style="font-size:0.8rem;color:#6c5ce7;line-height:1.6;">下の <strong>共有ボタン（□↑）</strong>から<br><strong>「ホーム画面に追加」</strong>をタップしてね</div>';
+    } else {
+      content.innerHTML = '<div style="font-size:0.95rem;font-weight:900;color:#10ac84;margin-bottom:0.3rem;">📲 アプリとして使えるよ！</div>'
+        + '<div style="font-size:0.8rem;color:#6c5ce7;line-height:1.6;">ブラウザのメニュー（⋮）から<br><strong>「ホーム画面に追加」</strong>してね</div>';
+    }
     banner.style.display = 'block';
+  }
+
+  if (isIOS) {
+    showTextGuide();
   } else {
-    // Android / PC: インストールボタン
+    // Android / PC: インストールボタンを試みる
+    let prompted = false;
     window.addEventListener('beforeinstallprompt', e => {
       e.preventDefault();
       deferredPrompt = e;
+      prompted = true;
       content.innerHTML = '<div style="font-size:0.95rem;font-weight:900;color:#10ac84;margin-bottom:0.5rem;">📲 アプリとして使えるよ！</div>'
         + '<button id="install-btn" style="font-family:Zen Maru Gothic,sans-serif;font-weight:900;font-size:1rem;padding:10px 28px;border-radius:100px;border:none;cursor:pointer;background:linear-gradient(135deg,#10ac84,#54c7ec);color:white;box-shadow:0 4px 14px rgba(16,172,132,0.35);">インストール 🎉</button>';
       banner.style.display = 'block';
@@ -909,6 +921,9 @@ window.addEventListener('resize', () => {
         });
       });
     });
+
+    // beforeinstallpromptが来なかった場合、テキスト案内を表示
+    setTimeout(() => { if (!prompted) showTextGuide(); }, 2000);
 
     window.addEventListener('appinstalled', () => {
       banner.style.display = 'none';
