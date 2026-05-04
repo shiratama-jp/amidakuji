@@ -223,6 +223,7 @@ canvas { display: block; margin: 0 auto; max-width: 100%; }
     <button class="theme-btn" data-theme="どうぶつ">🐱 どうぶつ</button>
     <button class="theme-btn" data-theme="ごはん">🍚 ごはん</button>
     <button class="theme-btn" data-theme="おかし">🍭 おかし</button>
+    <button class="theme-btn" data-theme="すうじ">🔢 すうじ</button>
   </div>
   <h2 style="text-align:center;color:#6c5ce7;margin-bottom:1rem;">いくつにする？</h2>
   <div class="ninzu-btns" id="kids-ninzu">
@@ -290,7 +291,8 @@ const COLORS = ['#ff6b9d','#ff9f43','#54c7ec','#5f27cd','#10ac84','#ee5a24','#06
 const ITEM_SETS = {
   'どうぶつ': ['🐱','🐶','🐰','🐹','🐼','🐨','🦊','🐯','🐸','🐧','🐮','🐷'],
   'ごはん':   ['🍚','🍜','🍝','🍛','🍣','🍱','🍕','🍔','🥪','🌮','🍤','🍙'],
-  'おかし':   ['🍭','🍰','🍫','🍬','🍩','🍪','🧁','🎂','🍡','🍮','🍦','🍧']
+  'おかし':   ['🍭','🍰','🍫','🍬','🍩','🍪','🧁','🎂','🍡','🍮','🍦','🍧'],
+  'すうじ':   ['1','2','3','4','5']
 };
 
 let N = 4;
@@ -381,6 +383,10 @@ document.getElementById('kids-start-btn').addEventListener('click', () => {
 });
 
 function pickKidsItems() {
+  if (selectedTheme === 'すうじ') {
+    items = Array.from({ length: N }, (_, i) => String(i + 1));
+    return;
+  }
   const pool = [...ITEM_SETS[selectedTheme]];
   items = [];
   for (let i = 0; i < N; i++) {
