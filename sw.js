@@ -1,9 +1,10 @@
-const CACHE_NAME = 'kimeyo-rando-v1';
+const CACHE_NAME = 'kimeyo-rando-v2';
 const ASSETS = [
   './',
   './index.html',
   './amida.html',
   './animal_coin_toss.html',
+  './roulette.html',
   './manifest.json',
   './qr20260416234205503.png',
   './icons/icon-192.png',

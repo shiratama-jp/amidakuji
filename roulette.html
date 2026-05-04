@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ルーレット</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root { --shadow: rgba(100,80,180,0.15); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  background: #fff9f0;
+  min-height: 100vh;
+  padding: 2rem 1rem 4rem;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255,160,80,0.12) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(255,120,60,0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(255,200,100,0.08) 0%, transparent 60%);
+}
+h1 {
+  font-size: 2.4rem;
+  text-align: center;
+  margin-bottom: 0.2rem;
+  background: linear-gradient(135deg, #ff6b9d, #a29bfe, #54c7ec);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 4px rgba(162,155,254,0.3));
+}
+.subtitle { text-align: center; font-size: 13px; color: #b2a8d8; letter-spacing: 0.1em; margin-bottom: 2rem; }
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 2rem 1.5rem;
+  max-width: 520px;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 4px 24px var(--shadow);
+}
+
+/* スタート画面 */
+#start-card { text-align: center; }
+#start-card .big-emoji { font-size: 4rem; margin-bottom: 1rem; display: block; }
+#start-card h2 { font-size: 1.6rem; color: #6c5ce7; margin-bottom: 0.5rem; }
+#start-card p { font-size: 1rem; color: #b2a8d8; margin-bottom: 2rem; }
+.start-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+/* テーマ選択 */
+.theme-grid { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.theme-btn {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 1.1rem; font-weight: 900;
+  padding: 14px 22px;
+  border-radius: 16px;
+  border: 3px solid #e8e0ff;
+  background: white; color: #6c5ce7;
+  cursor: pointer; transition: all 0.15s;
+  min-width: 110px;
+}
+.theme-btn:hover, .theme-btn.selected {
+  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+  color: white; border-color: #6c5ce7; transform: scale(1.05);
+}
+
+/* 人数選択 */
+.ninzu-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.ninzu-btn {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 1.8rem; font-weight: 900;
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  border: 3px solid #e8e0ff;
+  background: white; color: #6c5ce7;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.ninzu-btn:hover, .ninzu-btn.selected {
+  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+  color: white; border-color: #6c5ce7; transform: scale(1.1);
+}
+
+/* ボタン共通 */
+.btn {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: 900; font-size: 1.1rem;
+  padding: 14px 32px; border-radius: 100px; border: none;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-kids {
+  background: linear-gradient(135deg, #ff6b9d, #ff9f43); color: white;
+  font-size: 1.3rem; padding: 16px 40px;
+  box-shadow: 0 4px 18px rgba(255,107,157,0.4);
+}
+.btn-kids:hover { transform: translateY(-3px) scale(1.03); }
+.btn-adult {
+  background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: white;
+  box-shadow: 0 4px 14px rgba(108,92,231,0.35);
+}
+.btn-adult:hover { transform: translateY(-2px); }
+.btn-go {
+  background: linear-gradient(135deg, #ff6b9d, #ff9f43); color: white;
+  font-size: 1.2rem; padding: 14px 36px;
+  box-shadow: 0 4px 18px rgba(255,107,157,0.4);
+}
+.btn-go:hover:not(:disabled) { transform: translateY(-2px); }
+.btn-go:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-stop {
+  background: linear-gradient(135deg, #fd79a8, #e17055); color: white;
+  font-size: 1.3rem; padding: 16px 48px;
+  box-shadow: 0 4px 18px rgba(253,121,168,0.4);
+}
+.btn-stop:hover:not(:disabled) { transform: translateY(-2px); }
+.btn-stop:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-reset {
+  background: linear-gradient(135deg, #74b9ff, #54c7ec); color: white;
+  box-shadow: 0 4px 14px rgba(84,199,236,0.35);
+}
+.btn-reset:hover { transform: translateY(-2px); }
+.action-row { display: flex; gap: 10px; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+.hint { font-size: 1rem; color: #b2a8d8; text-align: center; margin-bottom: 0.8rem; font-weight: 700; }
+.step-label { font-size: 14px; font-weight: 800; letter-spacing: 0.15em; color: #a29bfe; margin-bottom: 0.8rem; }
+
+/* ルーレット本体 */
+#roulette-wrap { max-width: 520px; margin: 0 auto; }
+
+.marker-wrap {
+  text-align: center; line-height: 1;
+  margin-bottom: -14px;
+  position: relative; z-index: 2;
+  pointer-events: none;
+}
+.marker-wrap span {
+  font-size: 2.8rem; color: #ff6b9d;
+  filter: drop-shadow(0 2px 6px rgba(255,107,157,0.6));
+}
+
+#roulette-card {
+  background: white; border-radius: 24px;
+  padding: 0.8rem 0.5rem 1rem;
+  box-shadow: 0 4px 24px var(--shadow);
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+canvas { display: block; margin: 0 auto; max-width: 100%; }
+
+/* 結果オーバーレイ */
+#result-card {
+  display: none;
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,249,240,0.97);
+  border-radius: 24px;
+  padding: 1.5rem 1rem;
+  z-index: 10;
+  opacity: 0; transition: opacity 0.5s ease;
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+}
+#result-card.visible { opacity: 1; }
+#result-card h3 { font-size: 1.5rem; color: #6c5ce7; margin-bottom: 0.8rem; }
+.result-emoji { font-size: 4.5rem; display: block; margin: 0.3rem 0; }
+.result-label {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 80px; height: 52px; padding: 0 20px;
+  border-radius: 26px; color: white; font-size: 1.4rem; font-weight: 900;
+  margin: 0.3rem 0;
+}
+
+/* コントロールカード */
+#ctrl-card {
+  background: white; border-radius: 20px; padding: 1rem;
+  box-shadow: 0 4px 24px var(--shadow);
+  text-align: center;
+  transition: opacity 0.4s ease, max-height 0.4s ease, padding 0.4s ease, margin 0.4s ease;
+}
+
+/* 戻るボタン */
+.back-btn {
+  position: fixed; top: 12px; left: 12px;
+  width: auto; height: 44px; padding: 0 16px;
+  background: #fff; border: 3px solid #10ac84; border-radius: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 16px; font-weight: 900; color: #10ac84;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(100,80,180,0.15);
+  z-index: 1000; text-decoration: none;
+  transition: transform 0.2s;
+  user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.back-btn:active { transform: scale(0.9); }
+
+@media (max-width: 480px) {
+  h1 { font-size: 1.8rem; }
+  .btn-kids { font-size: 1.1rem; padding: 14px 28px; }
+  .card { padding: 1.2rem 1rem; }
+}
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-btn" id="backBtn">もどる</a>
+
+<h1>🎡 ルーレット</h1>
+<div class="subtitle">Ver.260504-1.00</div>
+
+<!-- スタート画面 -->
+<div class="card" id="start-card">
+  <span class="big-emoji">🎡</span>
+  <h2>ルーレットを まわそう！</h2>
+  <p>どちらで あそぶ？</p>
+  <div class="start-btns">
+    <button class="btn btn-kids" id="kids-btn">🌟 かんたん</button>
+    <button class="btn btn-adult" id="adult-btn">☀️ ふつう</button>
+  </div>
+</div>
+
+<!-- かんたんモード設定 -->
+<div class="card" id="kids-card" style="display:none">
+  <h2 style="text-align:center;color:#6c5ce7;margin-bottom:1.2rem;">テーマをえらんでね！</h2>
+  <div class="theme-grid">
+    <button class="theme-btn" data-theme="どうぶつ">🐱 どうぶつ</button>
+    <button class="theme-btn" data-theme="ごはん">🍚 ごはん</button>
+    <button class="theme-btn" data-theme="おかし">🍭 おかし</button>
+  </div>
+  <h2 style="text-align:center;color:#6c5ce7;margin-bottom:1rem;">いくつにする？</h2>
+  <div class="ninzu-btns" id="kids-ninzu">
+    <button class="ninzu-btn" data-n="2">2</button>
+    <button class="ninzu-btn" data-n="3">3</button>
+    <button class="ninzu-btn" data-n="4">4</button>
+    <button class="ninzu-btn" data-n="5">5</button>
+  </div>
+  <div class="action-row">
+    <button class="btn btn-go" id="kids-start-btn" disabled>はじめる！ 🎡</button>
+  </div>
+</div>
+
+<!-- ふつうモード Step1 -->
+<div class="card" id="adult-step1-card" style="display:none">
+  <div class="step-label">STEP 1 — いくつにする？</div>
+  <div class="ninzu-btns" id="adult-ninzu">
+    <button class="ninzu-btn" data-n="2">2</button>
+    <button class="ninzu-btn" data-n="3">3</button>
+    <button class="ninzu-btn" data-n="4">4</button>
+    <button class="ninzu-btn" data-n="5">5</button>
+  </div>
+  <div class="action-row">
+    <button class="btn btn-adult" id="adult-next-btn" disabled>入力へ →</button>
+  </div>
+</div>
+
+<!-- ふつうモード Step2 -->
+<div class="card" id="adult-step2-card" style="display:none">
+  <div class="step-label">STEP 2 — 出目を入力してね（空欄でもOK）</div>
+  <div id="item-inputs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:1rem;max-width:480px;margin-left:auto;margin-right:auto;"></div>
+  <div class="action-row">
+    <button class="btn btn-go" id="adult-start-btn">はじめる！ 🎡</button>
+    <button class="btn" id="adult-clear-btn" style="background:linear-gradient(135deg,#b2bec3,#636e72);color:white;">クリア 🗑️</button>
+  </div>
+</div>
+
+<!-- ルーレット本体 -->
+<div id="roulette-wrap" style="display:none">
+  <div class="marker-wrap"><span>▼</span></div>
+  <div id="roulette-card">
+    <canvas id="roulette-canvas"></canvas>
+    <div id="result-card">
+      <h3>🎊 けっかはっぴょう！</h3>
+      <span id="result-display" class="result-emoji"></span>
+      <span id="result-label-el" class="result-label" style="display:none"></span>
+      <div class="action-row" style="margin-top:1.2rem;">
+        <button class="btn btn-reset" id="again-btn">もういちど！</button>
+        <button class="btn btn-reset" id="back-to-start-btn">はじめから 🔄</button>
+      </div>
+    </div>
+  </div>
+  <div id="ctrl-card">
+    <div class="hint" id="hint-text">スタートをおしてね！</div>
+    <div class="action-row">
+      <button class="btn btn-go" id="spin-start-btn">▶ スタート</button>
+      <button class="btn btn-stop" id="spin-stop-btn" style="display:none" disabled>■ ストップ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS = ['#ff6b9d','#ff9f43','#54c7ec','#5f27cd','#10ac84','#ee5a24','#0652dd','#c44569'];
+
+const ITEM_SETS = {
+  'どうぶつ': ['🐱','🐶','🐰','🐹','🐼','🐨','🦊','🐯','🐸','🐧','🐮','🐷'],
+  'ごはん':   ['🍚','🍜','🍝','🍛','🍣','🍱','🍕','🍔','🥪','🌮','🍤','🍙'],
+  'おかし':   ['🍭','🍰','🍫','🍬','🍩','🍪','🧁','🎂','🍡','🍮','🍦','🍧']
+};
+
+let N = 4;
+let items = [];
+let isKidsMode = false;
+let selectedTheme = null;
+
+// ===== Audio =====
+let audioCtx = null;
+function getAC() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTone(freq, type, dur, vol = 0.25, delay = 0) {
+  const ac = getAC();
+  const osc = ac.createOscillator(), g = ac.createGain();
+  osc.connect(g); g.connect(ac.destination);
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, ac.currentTime + delay);
+  g.gain.setValueAtTime(vol, ac.currentTime + delay);
+  g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + delay + dur);
+  osc.start(ac.currentTime + delay);
+  osc.stop(ac.currentTime + delay + dur);
+}
+function seClick() { playTone(600, 'sine', 0.1, 0.2); playTone(900, 'sine', 0.08, 0.12, 0.05); }
+function seStart() { [261.6, 329.6, 392, 523.3].forEach((f, i) => playTone(f, 'triangle', 0.18, 0.18, i * 0.07)); }
+function seStop()  { playTone(880, 'sawtooth', 0.1, 0.2); playTone(600, 'sine', 0.2, 0.2, 0.1); }
+function seTick()  { playTone(1200, 'sine', 0.03, 0.08); }
+function seResult() {
+  [[523,0],[523,0.1],[523,0.2],[659,0.3],[523,0.5],[659,0.6],[784,0.75]]
+    .forEach(([f, d]) => playTone(f, 'triangle', 0.25, 0.28, d));
+}
+
+// ===== スタート画面 =====
+document.getElementById('kids-btn').addEventListener('click', () => {
+  seClick();
+  isKidsMode = true;
+  document.getElementById('start-card').style.display = 'none';
+  document.getElementById('kids-card').style.display = 'block';
+});
+document.getElementById('adult-btn').addEventListener('click', () => {
+  seClick();
+  isKidsMode = false;
+  document.getElementById('start-card').style.display = 'none';
+  document.getElementById('adult-step1-card').style.display = 'block';
+  // 保存済み件数を復元
+  const saved = JSON.parse(localStorage.getItem('roulette-settings') || '{}');
+  if (saved.count) {
+    document.querySelectorAll('#adult-ninzu .ninzu-btn').forEach(b => {
+      if (parseInt(b.dataset.n) === saved.count) b.click();
+    });
+  }
+});
+
+// ===== かんたんモード =====
+let selectedN_kids = null;
+
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedTheme = btn.dataset.theme;
+    checkKidsReady();
+    seClick();
+  });
+});
+
+document.querySelectorAll('#kids-ninzu .ninzu-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#kids-ninzu .ninzu-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedN_kids = parseInt(btn.dataset.n);
+    checkKidsReady();
+    seClick();
+  });
+});
+
+function checkKidsReady() {
+  document.getElementById('kids-start-btn').disabled = !(selectedTheme && selectedN_kids);
+}
+
+document.getElementById('kids-start-btn').addEventListener('click', () => {
+  N = selectedN_kids;
+  pickKidsItems();
+  seClick();
+  document.getElementById('kids-card').style.display = 'none';
+  startRoulette();
+});
+
+function pickKidsItems() {
+  const pool = [...ITEM_SETS[selectedTheme]];
+  items = [];
+  for (let i = 0; i < N; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    items.push(pool.splice(idx, 1)[0]);
+  }
+}
+
+// ===== ふつうモード =====
+let selectedN_adult = null;
+
+document.querySelectorAll('#adult-ninzu .ninzu-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#adult-ninzu .ninzu-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedN_adult = parseInt(btn.dataset.n);
+    document.getElementById('adult-next-btn').disabled = false;
+    seClick();
+  });
+});
+
+document.getElementById('adult-next-btn').addEventListener('click', () => {
+  N = selectedN_adult;
+  buildItemInputs();
+  seClick();
+  document.getElementById('adult-step1-card').style.display = 'none';
+  document.getElementById('adult-step2-card').style.display = 'block';
+});
+
+function buildItemInputs() {
+  const wrap = document.getElementById('item-inputs');
+  wrap.innerHTML = '';
+  const saved = JSON.parse(localStorage.getItem('roulette-settings') || '{}');
+  for (let i = 0; i < N; i++) {
+    const d = document.createElement('div');
+    d.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
+    d.innerHTML = `<label style="font-size:14px;font-weight:800;color:#a29bfe;">出目 ${i + 1}</label>
+      <input type="text" maxlength="4" placeholder="${i + 1}" id="item-input-${i}"
+        style="font-size:17px;font-weight:700;padding:10px 12px;border:2px solid #e8e0ff;border-radius:10px;outline:none;color:#5f27cd;width:100%;" />`;
+    wrap.appendChild(d);
+    if (saved.items && saved.items[i]) document.getElementById(`item-input-${i}`).value = saved.items[i];
+    document.getElementById(`item-input-${i}`).addEventListener('input', saveAdultSettings);
+  }
+}
+
+function saveAdultSettings() {
+  const vals = [];
+  for (let i = 0; i < N; i++) vals.push(document.getElementById(`item-input-${i}`)?.value || '');
+  localStorage.setItem('roulette-settings', JSON.stringify({ count: N, items: vals }));
+}
+
+document.getElementById('adult-clear-btn').addEventListener('click', () => {
+  localStorage.removeItem('roulette-settings');
+  for (let i = 0; i < N; i++) {
+    const el = document.getElementById(`item-input-${i}`);
+    if (el) el.value = '';
+  }
+});
+
+document.getElementById('adult-start-btn').addEventListener('click', () => {
+  items = [];
+  for (let i = 0; i < N; i++) {
+    const val = document.getElementById(`item-input-${i}`)?.value.trim() || `${i + 1}`;
+    items.push(val);
+  }
+  seClick();
+  document.getElementById('adult-step2-card').style.display = 'none';
+  startRoulette();
+});
+
+// ===== ルーレット =====
+const canvas = document.getElementById('roulette-canvas');
+const ctx = canvas.getContext('2d');
+
+let angle = 0;
+let state = 'idle'; // idle | spinning | stopping | done
+let resultIndex = -1;
+let stopStartAngle = 0, stopTotalDelta = 0, stopStartTime = 0, stopDuration = 2800;
+let rafId = null;
+let lastTickSeg = -1;
+
+function getCanvasSize() {
+  return Math.min(460, window.innerWidth - 32);
+}
+
+function drawRoulette(a) {
+  const size = canvas.width;
+  const cx = size / 2, cy = size / 2;
+  const r = size / 2 - 6;
+  const step = (2 * Math.PI) / N;
+
+  ctx.clearRect(0, 0, size, size);
+
+  for (let i = 0; i < N; i++) {
+    const startA = -Math.PI / 2 + a + i * step;
+    const endA = startA + step;
+
+    // 扇形
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startA, endA);
+    ctx.closePath();
+    ctx.fillStyle = COLORS[i % COLORS.length];
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // テキスト
+    const midA = startA + step / 2;
+    const tr = r * 0.63;
+    const tx = cx + tr * Math.cos(midA);
+    const ty = cy + tr * Math.sin(midA);
+    ctx.save();
+    ctx.translate(tx, ty);
+    ctx.rotate(midA + Math.PI / 2);
+    const item = items[i] || '';
+    const isEmoji = /\p{Emoji_Presentation}/u.test(item);
+    ctx.font = isEmoji
+      ? `${Math.floor(size / 9)}px serif`
+      : `bold ${Math.floor(size / 13)}px 'Zen Maru Gothic', sans-serif`;
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(item, 0, 0);
+    ctx.restore();
+  }
+
+  // 中央の丸
+  ctx.beginPath();
+  ctx.arc(cx, cy, size * 0.07, 0, 2 * Math.PI);
+  ctx.fillStyle = 'white';
+  ctx.fill();
+  ctx.strokeStyle = '#e0d8ff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // 止まった時のハイライト
+  if (state === 'done') {
+    const hi = getCurrentSeg(a);
+    const startA2 = -Math.PI / 2 + a + hi * step;
+    const endA2 = startA2 + step;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startA2, endA2);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+    ctx.lineWidth = 5;
+    ctx.stroke();
+  }
+}
+
+function getCurrentSeg(a) {
+  const step = (2 * Math.PI) / N;
+  // ▼が上(-π/2)を指す。セグメントiの中央が上に来る角度: a = -(i*step + step/2)
+  // 逆算: i = floor( (-a mod 2π) / step )
+  const norm = ((-a) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+  return Math.floor(norm / step) % N;
+}
+
+function frame() {
+  if (state === 'spinning') {
+    angle += 0.12;
+  } else if (state === 'stopping') {
+    const elapsed = Date.now() - stopStartTime;
+    const t = Math.min(elapsed / stopDuration, 1);
+    const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+    angle = stopStartAngle + stopTotalDelta * eased;
+    if (t >= 1) {
+      angle = stopStartAngle + stopTotalDelta;
+      state = 'done';
+      drawRoulette(angle);
+      setTimeout(showResult, 500);
+      return;
+    }
+  }
+
+  // セグメント通過時にティック音
+  const seg = getCurrentSeg(angle);
+  if (seg !== lastTickSeg) {
+    seTick();
+    lastTickSeg = seg;
+  }
+
+  drawRoulette(angle);
+  rafId = requestAnimationFrame(frame);
+}
+
+function startRoulette() {
+  angle = 0;
+  state = 'idle';
+  resultIndex = -1;
+  lastTickSeg = -1;
+
+  const size = getCanvasSize();
+  canvas.width = size;
+  canvas.height = size;
+
+  document.getElementById('roulette-wrap').style.display = 'block';
+  document.getElementById('result-card').style.display = 'none';
+  document.getElementById('result-card').classList.remove('visible');
+
+  const ctrl = document.getElementById('ctrl-card');
+  ctrl.style.opacity = '';
+  ctrl.style.maxHeight = '';
+  ctrl.style.padding = '';
+  ctrl.style.overflow = '';
+
+  document.getElementById('spin-start-btn').style.display = 'inline-flex';
+  document.getElementById('spin-stop-btn').style.display = 'none';
+  document.getElementById('spin-stop-btn').disabled = true;
+  document.getElementById('hint-text').textContent = 'スタートをおしてね！';
+
+  drawRoulette(0);
+}
+
+document.getElementById('spin-start-btn').addEventListener('click', () => {
+  if (state !== 'idle') return;
+  state = 'spinning';
+  lastTickSeg = -1;
+  seStart();
+  document.getElementById('spin-start-btn').style.display = 'none';
+  document.getElementById('spin-stop-btn').style.display = 'inline-flex';
+  document.getElementById('spin-stop-btn').disabled = true;
+  document.getElementById('hint-text').textContent = 'ストップをおしてね！';
+  setTimeout(() => {
+    if (state === 'spinning') document.getElementById('spin-stop-btn').disabled = false;
+  }, 1500);
+  rafId = requestAnimationFrame(frame);
+});
+
+document.getElementById('spin-stop-btn').addEventListener('click', () => {
+  if (state !== 'spinning') return;
+  document.getElementById('spin-stop-btn').disabled = true;
+  seStop();
+
+  resultIndex = Math.floor(Math.random() * N);
+
+  // resultIndex のセグメント中央が▼(上)に来る最終角度を計算
+  // getCurrentSeg(a) === resultIndex になる a:
+  // a ≡ -(resultIndex * step + step/2)  (mod 2π)
+  const step = (2 * Math.PI) / N;
+  let targetAngle = -(resultIndex * step + step / 2);
+  const minAngle = angle + 4 * Math.PI; // 最低2回転先
+  while (targetAngle < minAngle) targetAngle += 2 * Math.PI;
+
+  stopStartAngle = angle;
+  stopTotalDelta = targetAngle - angle;
+  stopStartTime = Date.now();
+  // ease-out cubicの初速(= totalDelta*3/duration)がspinning速度(0.12rad/frame*60fps)と一致するよう計算
+  stopDuration = (stopTotalDelta * 3 / (0.12 * 60)) * 1000;
+  state = 'stopping';
+
+  document.getElementById('hint-text').textContent = 'どこで とまるかな…？';
+  const ctrl = document.getElementById('ctrl-card');
+  ctrl.style.opacity = '0';
+  ctrl.style.maxHeight = '0';
+  ctrl.style.padding = '0';
+  ctrl.style.overflow = 'hidden';
+});
+
+function showResult() {
+  seResult();
+  const item = items[resultIndex];
+  const color = COLORS[resultIndex % COLORS.length];
+  const isEmoji = /\p{Emoji_Presentation}/u.test(item || '');
+  const dispEl = document.getElementById('result-display');
+  const labelEl = document.getElementById('result-label-el');
+
+  if (isEmoji) {
+    dispEl.style.display = 'block';
+    dispEl.textContent = item;
+    labelEl.style.display = 'none';
+  } else {
+    dispEl.style.display = 'none';
+    labelEl.style.display = 'inline-flex';
+    labelEl.style.background = color;
+    labelEl.textContent = item;
+  }
+
+  const rc = document.getElementById('result-card');
+  rc.style.display = 'flex';
+  requestAnimationFrame(() => rc.classList.add('visible'));
+}
+
+document.getElementById('again-btn').addEventListener('click', () => {
+  if (rafId) cancelAnimationFrame(rafId);
+  if (isKidsMode) pickKidsItems();
+  startRoulette();
+});
+
+document.getElementById('back-to-start-btn').addEventListener('click', () => {
+  location.reload();
+});
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('roulette-wrap').style.display !== 'none') {
+    const size = getCanvasSize();
+    canvas.width = size;
+    canvas.height = size;
+    drawRoulette(angle);
+  }
+});
+
+document.getElementById('backBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  if (history.length > 1) history.back();
+  else location.replace('index.html');
+});
+</script>
+</body>
+</html>
