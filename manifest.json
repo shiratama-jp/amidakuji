@@ -1,12 +1,12 @@
 {
-  "name": "あみだくじ",
-  "short_name": "あみだくじ",
-  "description": "かわいいあみだくじアプリ",
+  "name": "運試し！きめようらんど",
+  "short_name": "きめようらんど",
+  "description": "あみだくじ・コイン表裏で何でも決めよう！",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#fff5e6",
-  "theme_color": "#a29bfe",
+  "background_color": "#c8eaff",
+  "theme_color": "#fde68a",
   "lang": "ja",
   "icons": [
     {

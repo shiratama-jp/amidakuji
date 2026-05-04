@@ -1,957 +1,412 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>あみだくじ（こどもむけ）</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#a29bfe">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="あみだくじ">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
-<style>
-:root { --bg: #fff5e6; --shadow: rgba(100,80,180,0.15); }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'Zen Maru Gothic', sans-serif;
-  background: #fff9f0;
-  min-height: 100vh;
-  padding: 2rem 1rem 4rem;
-  background-image:
-    radial-gradient(circle at 10% 20%, rgba(255,160,80,0.12) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(255,120,60,0.08) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(255,200,100,0.08) 0%, transparent 60%);
-}
-h1 {
-  font-size: 2.4rem;
-  text-align: center;
-  margin-bottom: 0.2rem;
-  background: linear-gradient(135deg, #ff6b9d, #a29bfe, #54c7ec);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 2px 4px rgba(162,155,254,0.3));
-}
-.subtitle { text-align: center; font-size: 13px; color: #b2a8d8; letter-spacing: 0.1em; margin-bottom: 2rem; }
-.card { background: white; border-radius: 24px; padding: 2rem 1.5rem; max-width: 600px; margin: 0 auto 1.5rem; box-shadow: 0 4px 24px var(--shadow); }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>運試し！きめようらんど</title>
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#fde68a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="きめようらんど">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-sky: #c8eaff;
+            --bg-grass: #a8d890;
+            --text-main: #4a8a30;
+            --card-yellow: #fff9c4;
+            --card-blue: #e3f2fd;
+            --card-pink: #fce4ec;
+        }
 
-/* スタート画面 */
-#start-card { text-align: center; }
-#start-card .big-emoji { font-size: 4rem; margin-bottom: 1rem; display: block; }
-#start-card h2 { font-size: 1.6rem; color: #6c5ce7; margin-bottom: 0.5rem; }
-#start-card p { font-size: 1rem; color: #b2a8d8; margin-bottom: 2rem; }
-.start-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* 人数選択 */
-#ninzu-card { text-align: center; }
-#ninzu-card h2 { font-size: 1.4rem; color: #6c5ce7; margin-bottom: 1.5rem; }
-.ninzu-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
-.ninzu-btn {
-  font-family: 'Zen Maru Gothic', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 900;
-  width: 72px; height: 72px;
-  border-radius: 50%;
-  border: 3px solid #e8e0ff;
-  background: white;
-  color: #6c5ce7;
-  cursor: pointer;
-  transition: all 0.15s;
-  display: flex; align-items: center; justify-content: center;
-}
-.ninzu-btn:hover, .ninzu-btn.selected {
-  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
-  color: white;
-  border-color: #6c5ce7;
-  transform: scale(1.1);
-}
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background: var(--bg-sky);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-.btn {
-  font-family: 'Zen Maru Gothic', sans-serif;
-  font-weight: 900;
-  font-size: 1.1rem;
-  padding: 14px 32px;
-  border-radius: 100px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-kids {
-  background: linear-gradient(135deg, #ff6b9d, #ff9f43);
-  color: white;
-  font-size: 1.3rem;
-  padding: 16px 40px;
-  box-shadow: 0 4px 18px rgba(255,107,157,0.4);
-}
-.btn-kids:hover { transform: translateY(-3px) scale(1.03); }
-.btn-adult {
-  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
-  color: white;
-  box-shadow: 0 4px 14px rgba(108,92,231,0.35);
-}
-.btn-adult:hover { transform: translateY(-2px); }
-.btn-go { background: linear-gradient(135deg, #ff6b9d, #ff9f43); color: white; font-size: 1.2rem; padding: 14px 36px; box-shadow: 0 4px 18px rgba(255,107,157,0.4); }
-.btn-go:hover:not(:disabled) { transform: translateY(-2px); }
-.btn-go:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-.btn-regen { background: linear-gradient(135deg, #10ac84, #54c7ec); color: white; box-shadow: 0 4px 14px rgba(16,172,132,0.35); }
-.btn-regen:hover { transform: translateY(-2px); }
-.btn-reset { background: linear-gradient(135deg, #74b9ff, #54c7ec); color: white; box-shadow: 0 4px 14px rgba(84,199,236,0.35); }
-.btn-reset:hover { transform: translateY(-2px); }
-.btn-quick { background: linear-gradient(135deg, #fd79a8, #e17055); color: white; box-shadow: 0 4px 14px rgba(253,121,168,0.4); }
+        .meadow {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(to bottom, #d8f0d0 0%, var(--bg-grass) 100%);
+            z-index: -1;
+            border-radius: 50% 50% 0 0 / 10% 10% 0 0;
+            transform: scaleX(1.2);
+        }
 
-.action-row { display: flex; gap: 10px; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
-.hint { font-size: 1rem; color: #b2a8d8; text-align: center; margin-bottom: 0.8rem; font-weight: 700; }
+        .clouds {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+        }
 
-#amida-wrap { display: none; max-width: 640px; margin: 0 auto; }
-#amida-card { background: white; border-radius: 20px; padding: 1rem 0.5rem; box-shadow: 0 4px 24px var(--shadow); margin-bottom: 1rem; position: relative; }
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.7;
+            animation: move-cloud linear infinite;
+        }
 
-#player-prompt {
-  text-align: center;
-  padding: 1rem 1rem;
-  margin-bottom: 0.8rem;
-  font-size: 1.4rem;
-  font-weight: 900;
-  color: #6c5ce7;
-  background: linear-gradient(135deg, #fff0fa, #ffe8ff);
-  border-radius: 18px;
-  border: 2px solid #f0c8ff;
-  display: none;
-  line-height: 1.6;
-}
-#player-prompt .animal-big {
-  font-size: 2.5rem;
-  display: block;
-  margin-bottom: 0.2rem;
-}
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
 
-canvas { display: block; margin: 0 auto; border-radius: 12px; max-width: 100%; height: auto; }
+        .cloud-1 { width: 100px; height: 40px; top: 10%; left: -150px; animation-duration: 40s; }
+        .cloud-1::before { width: 50px; height: 50px; top: -20px; left: 15px; }
+        .cloud-1::after { width: 40px; height: 40px; top: -15px; left: 45px; }
 
-#result-card {
-  display: none;
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255,249,240,0.97);
-  border-radius: 20px;
-  padding: 1.2rem 1rem;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  overflow-y: auto;
-  text-align: center;
-}
-#result-card.visible { opacity: 1; }
-#result-card h3 { font-size: 1.5rem; color: #6c5ce7; margin-bottom: 1rem; }
-.result-list { list-style: none; padding: 0; margin-bottom: 1rem; }
-.result-list li {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  font-size: 1.4rem;
-  font-weight: 900;
-  padding: 10px 0;
-  border-bottom: 2px dashed #f0e8ff;
-}
-.result-list li:last-child { border-bottom: none; }
-.result-animal { font-size: 2rem; }
-.result-arrow { color: #b2a8d8; font-size: 1.2rem; }
-.result-goal {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-width: 52px; height: 44px; padding: 0 16px;
-  border-radius: 22px; color: white; font-size: 1.2rem;
-}
+        .cloud-2 { width: 120px; height: 45px; top: 25%; left: -180px; animation-duration: 55s; animation-delay: -10s; }
+        .cloud-2::before { width: 60px; height: 60px; top: -25px; left: 20px; }
+        .cloud-2::after { width: 50px; height: 50px; top: -20px; left: 55px; }
 
-@media (max-width: 480px) {
-  h1 { font-size: 1.8rem; }
-  .btn-kids { font-size: 1.1rem; padding: 14px 28px; }
-  .card { padding: 1.2rem 1rem; }
-}
-</style>
+        @keyframes move-cloud {
+            from { transform: translateX(-100px); }
+            to { transform: translateX(calc(100vw + 200px)); }
+        }
+
+        header {
+            margin-top: 5vh;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: clamp(24px, 7vw, 38px);
+            font-weight: 900;
+            color: var(--text-main);
+            text-shadow: 3px 3px 0 white;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: clamp(14px, 4vw, 18px);
+            font-weight: 700;
+            color: #6a9a50;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 4px 16px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+            padding: 40px 20px;
+            margin-top: 20px;
+        }
+
+        .menu-item {
+            text-decoration: none;
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 0 rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: 4px solid white;
+        }
+
+        .menu-item:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .menu-item.yellow { background: var(--card-yellow); border-color: #fdd835; }
+        .menu-item.orange { background: #fff3e0; border-color: #ffb74d; }
+
+        .emoji {
+            font-size: 50px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .item-title {
+            font-size: 16px;
+            font-weight: 900;
+            color: #444;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 16px 0 20px;
+            font-size: 12px;
+            color: #777;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copyright {
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        .btn-qr {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            font-size: 15px;
+            font-weight: 900;
+            color: white;
+            background: #4ade80;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+            transition: transform 0.1s, box-shadow 0.1s;
+            margin-top: 12px;
+            display: inline-block;
+        }
+        .btn-qr:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+        }
+
+        .qr-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 100;
+            align-items: center; justify-content: center;
+        }
+        .qr-overlay.show { display: flex; }
+        .qr-box {
+            background: white;
+            border-radius: 24px;
+            padding: 24px 20px 20px;
+            text-align: center;
+            max-width: 300px; width: 88%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+            animation: qrPop 0.25s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes qrPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to   { transform: scale(1);   opacity: 1; }
+        }
+        .qr-box h3 {
+            font-size: 16px; font-weight: 900;
+            color: var(--text-main); margin-bottom: 14px;
+        }
+        .qr-box img {
+            width: 100%; max-width: 220px;
+            border-radius: 12px;
+            border: 3px solid #e0e0e0;
+        }
+        .qr-box p {
+            font-size: 12px; color: #888;
+            margin: 10px 0 16px;
+            line-height: 1.6;
+        }
+        .btn-qr-close {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            font-size: 15px; font-weight: 900;
+            color: #666; background: #f0f0f0;
+            border: none; border-radius: 20px;
+            padding: 10px 32px; cursor: pointer;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.08);
+        }
+        .btn-qr-close:active { transform: translateY(2px); }
+
+        .install-banner {
+            display: none;
+            position: fixed;
+            bottom: 12px; left: 12px; right: 12px;
+            max-width: 460px; margin: 0 auto;
+            background: white;
+            border: 3px solid #4ade80;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            padding: 14px 16px;
+            z-index: 50;
+            animation: slideUpBanner 0.3s ease-out;
+        }
+        @keyframes slideUpBanner {
+            from { transform: translateY(20px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+        .install-banner.show { display: block; }
+        .install-banner .ib-head {
+            font-size: 15px; font-weight: 900; color: var(--text-main);
+            margin-bottom: 6px;
+        }
+        .install-banner .ib-body {
+            font-size: 13px; color: #555; line-height: 1.7;
+        }
+        .install-banner .ib-body strong { color: var(--text-main); font-weight: 700; }
+        .install-banner .ib-actions {
+            display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end;
+        }
+        .install-banner .ib-actions button {
+            background: #4ade80; color: white; border: none;
+            padding: 9px 20px; border-radius: 20px;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            font-size: 13px; font-weight: 900; cursor: pointer;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.1);
+        }
+        .install-banner .ib-dismiss {
+            background: transparent !important;
+            color: #aaa !important; box-shadow: none !important;
+        }
+    </style>
 </head>
 <body>
-
-<h1>🎉 あみだくじ</h1>
-<div class="subtitle">Ver.260418-1.04</div>
-
-<!-- スタート画面 -->
-<div class="card" id="start-card">
-  <span class="big-emoji">🐱🐶🐰🐹</span>
-  <h2>あみだくじを はじめよう！</h2>
-  <p>🎵 どれにしようか あみだくじ 🎵</p>
-  <div class="start-btns">
-    <button class="btn btn-kids" id="kids-btn">🌟 かんたん</button>
-    <button class="btn btn-adult" id="adult-btn">☀️ 通常</button>
-  </div>
-</div>
-
-<!-- インストール案内 -->
-<div id="install-banner" style="display:none;text-align:center;margin-top:0.5rem;margin-bottom:0.5rem;max-width:600px;margin-left:auto;margin-right:auto;">
-  <div style="display:inline-block;background:linear-gradient(135deg,#e8f8f0,#d4f5e4);border-radius:16px;padding:0.8rem 1.2rem;box-shadow:0 4px 16px rgba(16,172,132,0.15);border:2px solid #b8e8d0;">
-    <div id="install-content"></div>
-  </div>
-</div>
-
-<!-- QRコードエリア -->
-<div id="qr-area" style="text-align:center;margin-top:0.5rem;margin-bottom:1rem;">
-  <div style="display:inline-block;background:white;border-radius:16px;padding:1rem 1.5rem;box-shadow:0 4px 16px rgba(100,80,180,0.12);">
-    <img src="qr20260416234205503.png" width="120" height="120" style="border-radius:10px;margin:0 auto 0.6rem;display:block;">
-    <div style="font-size:11px;color:#b2a8d8;font-weight:700;letter-spacing:0.08em;">みんなであそんでね！</div>
-  </div>
-</div>
-
-<!-- 人数選択（こどもモード） -->
-<div class="card" id="ninzu-card" style="display:none;">
-  <h2>なんにんで あそぶ？</h2>
-  <div class="ninzu-btns">
-    <button class="ninzu-btn" data-n="2">2</button>
-    <button class="ninzu-btn" data-n="3">3</button>
-    <button class="ninzu-btn" data-n="4" >4</button>
-    <button class="ninzu-btn" data-n="5">5</button>
-    <button class="ninzu-btn" data-n="6">6</button>
-  </div>
-  <div class="action-row">
-    <button class="btn btn-go" id="ninzu-ok-btn" disabled>これで はじめる！ 🐾</button>
-  </div>
-</div>
-
-<!-- おとなモード STEP1 -->
-<div class="card" id="step1-card" style="display:none;">
-  <div style="font-size:15px;font-weight:800;letter-spacing:0.15em;color:#a29bfe;margin-bottom:0.8rem;">STEP 1 — 参加人数を入力</div>
-  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-    <label style="font-size:14px;font-weight:700;color:#6c5ce7;">参加人数</label>
-    <input type="number" id="num-input" min="2" max="8" value="4" style="width:80px;font-size:1.2rem;font-weight:800;padding:8px 12px;border:2.5px solid #d6c9ff;border-radius:12px;outline:none;color:#5f27cd;text-align:center;" />
-    <span style="font-size:13px;color:#b2a8d8;font-weight:700;">人（最大8人）</span>
-    <button class="btn btn-adult" id="setup-btn">参加受付 →</button>
-  </div>
-</div>
-
-<!-- おとなモード STEP2 -->
-<div class="card" id="step2-card" style="display:none;">
-  <div style="font-size:15px;font-weight:800;letter-spacing:0.15em;color:#a29bfe;margin-bottom:0.8rem;text-align:center;">STEP 2 — 名前とゴールを入力（空欄でもOK）</div>
-  <div style="font-size:16px;font-weight:800;color:#b2a8d8;margin-bottom:6px;text-align:center;">参加者の名前（最大4文字・絵文字OK）</div>
-  <div id="name-inputs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:0.8rem;max-width:480px;margin-left:auto;margin-right:auto;"></div>
-  <div style="font-size:16px;font-weight:800;color:#b2a8d8;margin-bottom:6px;margin-top:1rem;text-align:center;">ゴールの内容（最大4文字・絵文字OK）</div>
-  <div id="goal-inputs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:0.8rem;max-width:480px;margin-left:auto;margin-right:auto;"></div>
-  <div class="action-row">
-    <button class="btn btn-go" id="close-btn">参加締め切り 🎯</button>
-    <button class="btn" id="clear-btn" style="background:linear-gradient(135deg,#b2bec3,#636e72);color:white;">クリア 🗑️</button>
-  </div>
-</div>
-
-<!-- あみだ本体 -->
-<div id="amida-wrap">
-  <div class="card" id="ctrl-card" style="padding:1rem;transition:all 0.4s ease;">
-    <div class="hint" id="hint-text">スタート地点をえらんでね！</div>
-    <div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:0.8rem;">
-      <span style="font-size:1rem;">🐢</span>
-      <input type="range" id="speed-slider" min="1" max="10" value="4" step="1"
-        style="width:140px;accent-color:#a29bfe;cursor:pointer;" />
-      <span style="font-size:1rem;">🐇</span>
+    <div class="clouds">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
     </div>
-    <div class="action-row">
-      <button class="btn btn-adult" id="ready-btn" disabled>じゅんびOK！ ✨</button>
-      <button class="btn btn-regen" id="regen-btn" style="display:none;">あみだ再作成 🔀</button>
-      <button class="btn btn-go" id="go-btn" style="display:none;">よーいドン！ 🚀</button>
+    <div class="meadow"></div>
+
+    <header>
+        <h1>運試し！<br>きめようらんど</h1>
+        <p class="subtitle">あそびたいのを えらんでね！</p>
+        <button class="btn-qr" onclick="document.getElementById('qrOverlay').classList.add('show')">みんなで遊ぼう 📲</button>
+    </header>
+
+    <div class="menu-grid">
+        <a href="amida.html" class="menu-item yellow">
+            <span class="emoji">🎉</span>
+            <span class="item-title">あみだくじ</span>
+        </a>
+        <a href="animal_coin_toss.html" class="menu-item orange">
+            <span class="emoji">🪙</span>
+            <span class="item-title">どうぶつ<br>コイン表裏</span>
+        </a>
     </div>
-  </div>
-  <div id="player-prompt"></div>
-  <div id="amida-card">
-    <canvas id="amida-canvas"></canvas>
-    <div id="result-card">
-      <h3>🎊 けっかはっぴょう！</h3>
-      <ul class="result-list" id="result-list"></ul>
-      <div class="action-row" style="margin-top:1rem;">
-        <button class="btn btn-reset" id="reset-btn">もういちど！</button>
-        <button class="btn btn-reset" id="back-to-start-btn">さいしょから 🔄</button>
-      </div>
+
+    <footer>
+        <p class="copyright">&copy; きめようらんど</p>
+        <p class="copyright">Ver.260504-1.01</p>
+    </footer>
+
+    <div class="qr-overlay" id="qrOverlay" onclick="this.classList.remove('show')">
+        <div class="qr-box" onclick="event.stopPropagation()">
+            <h3>📲 このQRコードをよみとってね！</h3>
+            <img src="qr20260416234205503.png" alt="きめようらんど QRコード">
+            <p>スマホのカメラでよみとると<br>きめようらんどがひらくよ！</p>
+            <button class="btn-qr-close" onclick="document.getElementById('qrOverlay').classList.remove('show')">とじる</button>
+        </div>
     </div>
-  </div>
-</div>
 
-<script>
-const COLORS = ['#ff6b9d','#ff9f43','#54c7ec','#5f27cd','#10ac84','#ee5a24','#0652dd','#c44569'];
-const VPAD = 70, HPAD = 50, ROW_H = 50, ROWS = 10, ICON_R = 26;
+    <div class="install-banner" id="installBanner">
+        <div class="ib-head">📲 ホーム画面に追加できるよ！</div>
+        <div class="ib-body" id="installBody"></div>
+        <div class="ib-actions" id="installActions"></div>
+    </div>
 
-// こどもモード用動物リスト
-const ANIMALS = ['🐱','🐶','🐰','🐹','🐼','🐨','🦊','🐯'];
-// ゴール絵文字
-const GOAL_EMOJIS = ['⭐','🍎','🌸','🎀','🌈','🍭','🎈','🏆'];
-
-let N = 4;
-let names = [], goals = [], assignments = [], hbars = [], colX = [];
-let canvasW, canvasH, phase = 'assign', animating = false;
-let isKidsMode = false;
-
-const canvas = document.getElementById('amida-canvas');
-const ctx = canvas.getContext('2d');
-
-// ===== Web Audio API =====
-let audioCtx = null;
-function getAudioCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  return audioCtx;
-}
-function playTone(freq, type, duration, vol = 0.3, delay = 0) {
-  const ac = getAudioCtx();
-  const osc = ac.createOscillator();
-  const gain = ac.createGain();
-  osc.connect(gain); gain.connect(ac.destination);
-  osc.type = type;
-  osc.frequency.setValueAtTime(freq, ac.currentTime + delay);
-  gain.gain.setValueAtTime(vol, ac.currentTime + delay);
-  gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + delay + duration);
-  osc.start(ac.currentTime + delay);
-  osc.stop(ac.currentTime + delay + duration);
-}
-function playNoise(duration, vol = 0.15) {
-  const ac = getAudioCtx();
-  const bufSize = ac.sampleRate * duration;
-  const buf = ac.createBuffer(1, bufSize, ac.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
-  const src = ac.createBufferSource();
-  const gain = ac.createGain();
-  src.buffer = buf;
-  src.connect(gain); gain.connect(ac.destination);
-  gain.gain.setValueAtTime(vol, ac.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + duration);
-  src.start(); src.stop(ac.currentTime + duration);
-}
-function seClick() { playTone(600,'sine',0.1,0.25); playTone(900,'sine',0.08,0.15,0.05); }
-function seReady() { [261.6,329.6,392,523.3].forEach((f,i)=>playTone(f,'triangle',0.2,0.2,i*0.08)); }
-function seGo(callback) {
-  playTone(880,'square',0.12,0.2,0.0);
-  playTone(880,'square',0.12,0.2,0.4);
-  playTone(880,'square',0.12,0.2,0.8);
-  playTone(1320,'sawtooth',0.25,0.3,1.2);
-  playNoise(0.15,0.2);
-  setTimeout(callback, 1300);
-}
-function seCross(col) {
-  const freqs=[523,587,659,698,784,880,988,1047];
-  playTone(freqs[col%freqs.length],'sine',0.08,0.18);
-}
-function seFall() {
-  const ac=getAudioCtx(); const osc=ac.createOscillator(); const gain=ac.createGain();
-  osc.connect(gain); gain.connect(ac.destination); osc.type='sine';
-  osc.frequency.setValueAtTime(600,ac.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(150,ac.currentTime+0.18);
-  gain.gain.setValueAtTime(0.2,ac.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.18);
-  osc.start(ac.currentTime); osc.stop(ac.currentTime+0.18);
-}
-function seGoal(idx) {
-  const freqs=[523,659,784,880,988,1047,1175,1319];
-  const f=freqs[idx%freqs.length];
-  playTone(f,'sine',0.12,0.3); playTone(f*1.5,'sine',0.1,0.2,0.08); playNoise(0.06,0.1);
-}
-function seResult() {
-  const melody=[[523,0],[523,0.1],[523,0.2],[659,0.3],[523,0.5],[659,0.6],[784,0.75]];
-  melody.forEach(([f,d])=>playTone(f,'triangle',0.25,0.3,d));
-  playTone(392,'triangle',0.6,0.2,0.3);
-}
-
-// ===== スタート画面 =====
-document.getElementById('kids-btn').addEventListener('click', () => {
-  isKidsMode = true;
-  window._gameStarted = true;
-  document.getElementById('qr-area').style.display = 'none';
-  document.getElementById('install-banner').style.display = 'none';
-  document.getElementById('start-card').style.display = 'none';
-  document.getElementById('ninzu-card').style.display = 'block';
-  seClick();
-});
-
-document.getElementById('adult-btn').addEventListener('click', () => {
-  isKidsMode = false;
-  window._gameStarted = true;
-  document.getElementById('qr-area').style.display = 'none';
-  document.getElementById('install-banner').style.display = 'none';
-  document.getElementById('start-card').style.display = 'none';
-  document.getElementById('step1-card').style.display = 'block';
-  seClick();
-});
-
-// ===== 人数選択（こどもモード） =====
-let selectedN = null;
-document.querySelectorAll('.ninzu-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.ninzu-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    selectedN = parseInt(btn.dataset.n);
-    document.getElementById('ninzu-ok-btn').disabled = false;
-    seClick();
-  });
-});
-
-document.getElementById('ninzu-ok-btn').addEventListener('click', () => {
-  N = selectedN;
-  names = ANIMALS.slice(0, N);
-  goals = GOAL_EMOJIS.slice(0, N);
-  document.getElementById('ninzu-card').style.display = 'none';
-  startAmida();
-  seReady();
-});
-
-// ===== おとなモード STEP1 =====
-// 保存された人数を復元
-(function() {
-  const saved = JSON.parse(localStorage.getItem('amida-settings') || '{}');
-  if (saved.count) document.getElementById('num-input').value = saved.count;
-})();
-
-document.getElementById('setup-btn').addEventListener('click', () => {
-  N = Math.max(2, Math.min(8, parseInt(document.getElementById('num-input').value) || 4));
-  const defaultNames = 'ABCDEFGH';
-  const defaultGoals = ['1','2','3','4','5','6','7','8'];
-  const nameWrap = document.getElementById('name-inputs');
-  const goalWrap = document.getElementById('goal-inputs');
-  nameWrap.innerHTML = ''; goalWrap.innerHTML = '';
-  const saved = JSON.parse(localStorage.getItem('amida-settings') || '{}');
-  for (let i = 0; i < N; i++) {
-    const ng = document.createElement('div');
-    ng.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
-    ng.innerHTML = `<label style="font-size:15px;font-weight:800;color:#a29bfe;">参加者 ${defaultNames[i]}</label><input type="text" maxlength="4" placeholder="${defaultNames[i]}" id="name-${i}" style="font-size:17px;font-weight:700;padding:10px 12px;border:2px solid #e8e0ff;border-radius:10px;outline:none;color:#5f27cd;width:100%;" />`;
-    nameWrap.appendChild(ng);
-    const gg = document.createElement('div');
-    gg.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
-    gg.innerHTML = `<label style="font-size:15px;font-weight:800;color:#a29bfe;">ゴール ${defaultGoals[i]}</label><input type="text" maxlength="4" placeholder="${defaultGoals[i]}" id="goal-${i}" style="font-size:17px;font-weight:700;padding:10px 12px;border:2px solid #e8e0ff;border-radius:10px;outline:none;color:#5f27cd;width:100%;" />`;
-    goalWrap.appendChild(gg);
-    if (saved.names && saved.names[i]) document.getElementById(`name-${i}`).value = saved.names[i];
-    if (saved.goals && saved.goals[i]) document.getElementById(`goal-${i}`).value = saved.goals[i];
-    document.getElementById(`name-${i}`).addEventListener('input', saveSettings);
-    document.getElementById(`goal-${i}`).addEventListener('input', saveSettings);
-  }
-  document.getElementById('step1-card').style.display = 'none';
-  document.getElementById('step2-card').style.display = 'block';
-});
-
-function saveSettings() {
-  const savedNames = [], savedGoals = [];
-  for (let i = 0; i < N; i++) {
-    savedNames.push(document.getElementById(`name-${i}`)?.value || '');
-    savedGoals.push(document.getElementById(`goal-${i}`)?.value || '');
-  }
-  localStorage.setItem('amida-settings', JSON.stringify({ count: N, names: savedNames, goals: savedGoals }));
-}
-
-document.getElementById('clear-btn').addEventListener('click', () => {
-  localStorage.removeItem('amida-settings');
-  for (let i = 0; i < N; i++) {
-    document.getElementById(`name-${i}`).value = '';
-    document.getElementById(`goal-${i}`).value = '';
-  }
-});
-
-document.getElementById('close-btn').addEventListener('click', () => {
-  const defaultNames = 'ABCDEFGH';
-  const defaultGoals = ['1','2','3','4','5','6','7','8'];
-  names = []; goals = [];
-  for (let i = 0; i < N; i++) {
-    names.push(document.getElementById(`name-${i}`).value.trim() || defaultNames[i]);
-    goals.push(document.getElementById(`goal-${i}`).value.trim() || defaultGoals[i]);
-  }
-  document.getElementById('step2-card').style.display = 'none';
-  startAmida();
-});
-
-// ===== あみだ初期化 =====
-function fitCanvas() {
-  // 画面サイズに合わせてcanvasを計算
-  const vw = Math.min(580, window.innerWidth - 24);
-  const ctrlH = document.getElementById('ctrl-card') ? document.getElementById('ctrl-card').offsetHeight : 0;
-  const promptH = document.getElementById('player-prompt').offsetHeight || 0;
-  const headerH = document.querySelector('h1') ? document.querySelector('h1').offsetHeight + 40 : 80;
-  const padding = 80;
-  const availH = window.innerHeight - headerH - ctrlH - promptH - padding;
-  const targetH = Math.max(300, Math.min(600, availH));
-
-  // ROW_Hをtargetに合わせてスケール
-  const scale = targetH / (VPAD * 2 + ROW_H * ROWS + 80);
-  const scaledRowH = Math.floor(ROW_H * scale);
-  const scaledVpad = Math.floor(VPAD * scale);
-
-  canvasW = Math.min(vw, Math.max(N * 70 + HPAD * 2, 280));
-  canvasH = scaledVpad * 2 + scaledRowH * ROWS + 80;
-  canvas.width = canvasW; canvas.height = canvasH;
-
-  // グローバルにスケール済みの値を反映
-  window._scaledRowH = scaledRowH;
-  window._scaledVpad = scaledVpad;
-
-  const span = canvasW - HPAD * 2;
-  colX = [];
-  for (let i = 0; i < N; i++) colX.push(HPAD + (span / (N - 1)) * i);
-}
-
-function startAmida() {
-  assignments = new Array(N).fill(null);
-  hbars = []; phase = 'assign'; animating = false;
-
-  fitCanvas();
-  document.getElementById('amida-wrap').style.display = 'block';
-  document.getElementById('result-card').style.display = 'none';
-  document.getElementById('result-card').classList.remove('visible');
-  if (isKidsMode) {
-    document.getElementById('ready-btn').style.display = 'none';
-
-    document.getElementById('regen-btn').style.display = 'none';
-    document.getElementById('go-btn').style.display = 'none';
-    document.getElementById('go-btn').disabled = false;
-  } else {
-    document.getElementById('go-btn').style.display = 'none';
-    document.getElementById('regen-btn').style.display = 'none';
-    document.getElementById('ready-btn').style.display = 'none';
-
-  }
-
-  updatePrompt();
-  drawAmida();
-  canvas.addEventListener('click', onCanvasClick);
-}
-
-function updatePrompt() {
-  const filled = assignments.filter(a => a !== null).length;
-  const pp = document.getElementById('player-prompt');
-  if (filled === N) {
-    if (isKidsMode) {
-      document.getElementById('hint-text').textContent = 'ぜんいんきまった！「よーいドン！」をおしてね！';
-      document.getElementById('go-btn').style.display = 'inline-block';
-    } else {
-      document.getElementById('hint-text').textContent = 'じゅんびOK！「よーいドン！」をおしてね！';
-      generateHbars(); phase = 'ready';
-      document.getElementById('go-btn').style.display = 'inline-block';
-      document.getElementById('regen-btn').style.display = 'inline-block';
-  
-      drawAmida();
-    }
-    pp.style.display = 'none';
-  } else {
-    const animal = names[filled];
-    if (isKidsMode) {
-      document.getElementById('hint-text').textContent = 'スタートのばしょをえらんでね！';
-      pp.innerHTML = `<span class="animal-big">${animal}</span>${animal}ちゃんは どこにする？`;
-    } else {
-      document.getElementById('hint-text').textContent = `✨ ${animal}さん スタート地点を選んでください`;
-      pp.innerHTML = `<strong>${animal}</strong>さん、スタート地点を選んでください<div style="margin-top:0.8rem;"><button class="btn btn-quick" id="quick-btn" style="font-size:0.95rem;padding:10px 24px;">自動選択 ⚡</button></div>`;
-      document.getElementById('quick-btn').addEventListener('click', quickBtnHandler);
-    }
-    pp.style.display = 'block';
-  }
-}
-
-function checkReady() {
-  document.getElementById('ready-btn').disabled = assignments.filter(a => a !== null).length < N;
-}
-
-function onCanvasClick(e) {
-  if (phase !== 'assign') return;
-  const rect = canvas.getBoundingClientRect();
-  const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
-  const my = (e.clientY - rect.top) * (canvas.height / rect.height);
-  const topY = VPAD * 0.5;
-  for (let i = 0; i < N; i++) {
-    if (Math.abs(mx - colX[i]) < ICON_R + 8 && Math.abs(my - topY) < ICON_R + 8) {
-      if (assignments[i] !== null) {
-        const released = assignments[i];
-        assignments[i] = null;
-        for (let j = 0; j < N; j++) {
-          if (assignments[j] !== null && assignments[j] > released) assignments[j]--;
-        }
-      } else {
-        const used = assignments.filter(a => a !== null).length;
-        if (used < N) assignments[i] = used;
-      }
-      updatePrompt(); checkReady(); drawAmida();
-      seClick();
-      return;
-    }
-  }
-}
-
-document.getElementById('ready-btn').addEventListener('click', () => {
-  if (phase !== 'assign') return;
-  generateHbars(); phase = 'ready';
-  seReady();
-  document.getElementById('ready-btn').style.display = 'none';
-  document.getElementById('regen-btn').style.display = 'inline-block';
-  document.getElementById('go-btn').style.display = 'inline-block';
-  document.getElementById('hint-text').textContent = isKidsMode ? 'きにいらなければ「もういちど」！' : '気に入らなければ「再生成」、よければ「よーいドン！」！';
-  drawAmida();
-});
-
-document.getElementById('regen-btn').addEventListener('click', () => {
-  if (phase !== 'ready' && phase !== 'assign') return;
-  generateHbars(); phase = 'ready'; drawAmida();
-});
-
-function quickBtnHandler() {
-  const shuffled = [...Array(N).keys()].sort(() => Math.random() - 0.5);
-  assignments = new Array(N).fill(null);
-  shuffled.forEach((personIdx, col) => { assignments[col] = personIdx; });
-  generateHbars(); phase = 'ready';
-  document.getElementById('ready-btn').style.display = 'none';
-  document.getElementById('regen-btn').style.display = isKidsMode ? 'none' : 'inline-block';
-  document.getElementById('go-btn').style.display = 'inline-block';
-  document.getElementById('go-btn').disabled = false;
-  document.getElementById('regen-btn').disabled = false;
-  document.getElementById('player-prompt').style.display = 'none';
-  document.getElementById('hint-text').textContent = isKidsMode ? 'よーいドン！をおしてね！' : 'あみだ再作成もできるよ！';
-  drawAmida();
-}
-
-document.getElementById('go-btn').addEventListener('click', () => {
-  if (animating) return;
-  if (isKidsMode && phase === 'assign') {
-    // こどもモード：ボタンエリアを非表示にしてからスタート
-    generateHbars();
-    phase = 'running'; animating = true;
-    document.getElementById('go-btn').style.display = 'none';
-    document.getElementById('player-prompt').style.display = 'none';
-    document.getElementById('hint-text').style.display = 'none';
-    const ctrl = document.getElementById('ctrl-card');
-    ctrl.style.opacity = '0';
-    ctrl.style.maxHeight = '0';
-    ctrl.style.padding = '0';
-    ctrl.style.marginBottom = '0';
-    ctrl.style.overflow = 'hidden';
-    // canvasを再フィット、コマを表示したままスタート
-    setTimeout(() => {
-      fitCanvas();
-      phase = 'ready'; // drawAmidaでアイコンを描くため一時的にreadyに
-      drawAmida();
-      phase = 'running';
-      seGo(() => animateAll(calcPaths()));
-    }, 400);
-    return;
-  }
-  if (phase !== 'ready') return;
-  phase = 'running'; animating = true;
-  document.getElementById('go-btn').disabled = true;
-  document.getElementById('regen-btn').disabled = true;
-  // ボタンエリアをフェードアウト
-  const ctrl = document.getElementById('ctrl-card');
-  ctrl.style.opacity = '0';
-  ctrl.style.maxHeight = '0';
-  ctrl.style.padding = '0';
-  ctrl.style.marginBottom = '0';
-  ctrl.style.overflow = 'hidden';
-  document.getElementById('player-prompt').style.display = 'none';
-  setTimeout(() => { fitCanvas(); phase = 'ready'; drawAmida(); phase = 'running'; seGo(() => animateAll(calcPaths())); }, 400);
-});
-
-function generateHbars() {
-  let attempts = 0;
-  do {
-    hbars = [];
-    for (let row = 0; row < ROWS; row++) {
-      let used = new Set();
-      const shuffle = [...Array(N-1).keys()].sort(()=>Math.random()-0.5);
-      for (const col of shuffle) {
-        if (!used.has(col) && !used.has(col-1) && !used.has(col+1) && Math.random()<0.5) {
-          hbars.push({col,row}); used.add(col); used.add(col+1);
-        }
-      }
-    }
-    attempts++;
-  } while (!isValidHbars() && attempts < 100);
-}
-
-function isValidHbars() {
-  for (let i = 0; i < N; i++) {
-    if (!hbars.some(h => h.col===i || h.col===i-1)) return false;
-  }
-  return true;
-}
-
-function calcPaths() {
-  const paths = [];
-  const _RH = window._scaledRowH || ROW_H;
-  const _VP = window._scaledVpad || VPAD;
-  for (let i = 0; i < N; i++) {
-    const personIdx = assignments[i];
-    if (personIdx === null) continue;
-    let col = i;
-    const path = [{x: colX[col], y: _VP*0.5}];
-    for (let row = 0; row < ROWS; row++) {
-      const y0 = _VP + row * _RH;
-      path.push({x: colX[col], y: y0});
-      const right = hbars.find(h=>h.col===col&&h.row===row);
-      const left  = hbars.find(h=>h.col===col-1&&h.row===row);
-      if (right) { path.push({x:colX[col+1],y:y0}); col++; }
-      else if (left) { path.push({x:colX[col-1],y:y0}); col--; }
-    }
-    path.push({x: colX[col], y: VPAD+ROWS*ROW_H});
-    paths[personIdx] = {points: path, endCol: col};
-  }
-  return paths;
-}
-
-function animateAll(paths) {
-  const SPEED = parseFloat(document.getElementById('speed-slider').value) * 1.5;
-  const states = paths.map(p => {
-    if (!p) return null;
-    const dists = [0];
-    for (let i = 1; i < p.points.length; i++) {
-      const dx=p.points[i].x-p.points[i-1].x, dy=p.points[i].y-p.points[i-1].y;
-      dists.push(dists[dists.length-1]+Math.sqrt(dx*dx+dy*dy));
-    }
-    return {p, dists, total:dists[dists.length-1], traveled:0, done:false, lastSeg:0};
-  });
-
-  function getPos(s, traveled) {
-    for (let i = 1; i < s.dists.length; i++) {
-      if (traveled <= s.dists[i]) {
-        const seg=s.dists[i]-s.dists[i-1];
-        const t=seg>0?(traveled-s.dists[i-1])/seg:1;
-        return {x:s.p.points[i-1].x+(s.p.points[i].x-s.p.points[i-1].x)*t,
-                y:s.p.points[i-1].y+(s.p.points[i].y-s.p.points[i-1].y)*t, seg:i-1};
-      }
-    }
-    return {...s.p.points[s.p.points.length-1], seg:s.dists.length-1};
-  }
-
-  function isHSeg(s, si) {
-    if (si<0||si>=s.p.points.length-1) return false;
-    return Math.abs(s.p.points[si+1].x-s.p.points[si].x) > Math.abs(s.p.points[si+1].y-s.p.points[si].y);
-  }
-
-  function frame() {
-    drawAmida();
-    let allDone = true;
-    for (let idx = 0; idx < states.length; idx++) {
-      const s = states[idx];
-      if (!s) continue;
-      if (!s.done) {
-        s.traveled = Math.min(s.traveled+SPEED, s.total);
-        if (s.traveled>=s.total) { s.done=true; seGoal(idx); } else allDone=false;
-      }
-      const pos = getPos(s, s.traveled);
-      if (pos.seg!==s.lastSeg && isHSeg(s,pos.seg)) seCross(idx);
-      if (pos.seg!==s.lastSeg && !isHSeg(s,pos.seg) && pos.seg>0) seFall();
-      s.lastSeg = pos.seg;
-      drawIcon(pos.x, pos.y, names[idx], COLORS[idx%COLORS.length]);
-    }
-    if (!allDone) requestAnimationFrame(frame);
-    else { animating=false; phase='done'; seResult(); setTimeout(()=>showResult(paths),800); }
-  }
-  requestAnimationFrame(frame);
-}
-
-function drawAmida() {
-  const _RH = window._scaledRowH || ROW_H;
-  const _VP = window._scaledVpad || VPAD;
-  ctx.clearRect(0, 0, canvasW, canvasH);
-  const topY=_VP*0.5, bottomY=_VP+ROWS*_RH;
-
-  for (let i=0; i<N; i++) {
-    ctx.beginPath(); ctx.moveTo(colX[i],topY); ctx.lineTo(colX[i],bottomY);
-    ctx.strokeStyle='#d6c9ff'; ctx.lineWidth=4; ctx.lineCap='round'; ctx.stroke();
-  }
-  for (const {col,row} of hbars) {
-    const y=_VP+row*_RH;
-    ctx.beginPath(); ctx.moveTo(colX[col],y); ctx.lineTo(colX[col+1],y);
-    ctx.strokeStyle='#a29bfe'; ctx.lineWidth=4; ctx.lineCap='round'; ctx.stroke();
-  }
-
-  // ゴールバッジ
-  for (let i=0; i<N; i++) {
-    ctx.font = isKidsMode ? '28px serif' : 'bold 18px Zen Maru Gothic';
-    const bw = isKidsMode ? 44 : Math.max(50, ctx.measureText(goals[i]).width+28);
-    if (isKidsMode) {
-      ctx.font = '28px serif';
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(goals[i], colX[i], bottomY+50);
-    } else {
-      ctx.fillStyle=COLORS[i%COLORS.length];
-      ctx.beginPath(); ctx.roundRect(colX[i]-bw/2, bottomY+32, bw, 36, 10); ctx.fill();
-      ctx.fillStyle='white'; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(goals[i], colX[i], bottomY+50);
-    }
-  }
-
-  if (phase==='assign'||phase==='ready') {
-    for (let i=0; i<N; i++) {
-      const personIdx=assignments[i];
-      if (personIdx!==null) {
-        drawIcon(colX[i], topY, names[personIdx], COLORS[personIdx%COLORS.length]);
-      } else if (phase==='assign') {
-        ctx.beginPath(); ctx.arc(colX[i],topY,ICON_R,0,Math.PI*2);
-        ctx.fillStyle='#f0eaff'; ctx.fill();
-        ctx.strokeStyle='#d6c9ff'; ctx.lineWidth=2.5; ctx.stroke();
-        ctx.fillStyle='#c8b8f0'; ctx.font='bold 14px Zen Maru Gothic';
-        ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.fillText('?', colX[i], topY);
-      }
-    }
-  }
-}
-
-function drawIcon(x, y, label, color) {
-  if (isKidsMode) {
-    // 動物絵文字をそのまま大きく描く
-    ctx.beginPath(); ctx.arc(x,y+3,ICON_R,0,Math.PI*2);
-    ctx.fillStyle='rgba(0,0,0,0.1)'; ctx.fill();
-    ctx.beginPath(); ctx.arc(x,y,ICON_R,0,Math.PI*2);
-    ctx.fillStyle='white'; ctx.fill();
-    ctx.strokeStyle=color; ctx.lineWidth=3; ctx.stroke();
-    ctx.font='22px serif';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(label, x, y+1);
-  } else {
-    ctx.beginPath(); ctx.arc(x,y+3,ICON_R,0,Math.PI*2);
-    ctx.fillStyle='rgba(0,0,0,0.12)'; ctx.fill();
-    ctx.beginPath(); ctx.arc(x,y,ICON_R,0,Math.PI*2);
-    ctx.fillStyle=color; ctx.fill();
-    const len=(label||'').length;
-    const fontSize=len<=2?14:len===3?11:9;
-    ctx.fillStyle='white'; ctx.font=`bold ${fontSize}px Zen Maru Gothic`;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(label, x, y);
-  }
-}
-
-function showResult(paths) {
-  const rows = [];
-  for (let idx=0; idx<N; idx++) {
-    const p=paths[idx]; if (!p) continue;
-    rows.push({personIdx:idx, endCol:p.endCol});
-  }
-  rows.sort((a,b)=>a.endCol-b.endCol);
-
-  if (isKidsMode) {
-    const list = document.getElementById('result-list');
-    list.innerHTML = '';
-    rows.forEach(({personIdx, endCol}) => {
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <span class="result-animal">${names[personIdx]}</span>
-        <span class="result-arrow">➡️</span>
-        <span class="result-goal" style="background:${COLORS[endCol%COLORS.length]}">${goals[endCol]}</span>
-      `;
-      list.appendChild(li);
-    });
-  } else {
-    // おとなモードは従来のテーブル表示
-    const list = document.getElementById('result-list');
-    list.innerHTML = '';
-    rows.forEach(({personIdx, endCol}, i) => {
-      const color=COLORS[personIdx%COLORS.length];
-      const goalColor=COLORS[endCol%COLORS.length];
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <span style="color:#b2a8d8;font-size:1.1rem;">${i+1}.</span>
-        <span style="display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:42px;padding:0 16px;border-radius:20px;background:${goalColor};color:white;font-size:1.1rem;">${goals[endCol]}</span>
-        <span style="color:#b2a8d8;">←</span>
-        <span style="display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:42px;padding:0 16px;border-radius:20px;background:${color};color:white;font-size:1.1rem;">${names[personIdx]}</span>
-      `;
-      list.appendChild(li);
-    });
-  }
-
-  const rc = document.getElementById('result-card');
-  rc.style.display = 'block';
-  requestAnimationFrame(() => rc.classList.add('visible'));
-}
-
-document.getElementById('reset-btn').addEventListener('click', () => {
-  assignments = new Array(N).fill(null);
-  hbars=[]; phase='assign'; animating=false;
-
-  const rc2 = document.getElementById('result-card');
-  rc2.classList.remove('visible');
-  rc2.style.display='none';
-
-  document.getElementById('go-btn').style.display='none';
-  document.getElementById('go-btn').disabled=false;
-  document.getElementById('regen-btn').style.display='none';
-  document.getElementById('regen-btn').disabled=false;
-  document.getElementById('ready-btn').style.display='none';
-
-  const ctrl = document.getElementById('ctrl-card');
-  ctrl.style.opacity = '';
-  ctrl.style.maxHeight = '';
-  ctrl.style.padding = '1rem';
-  ctrl.style.marginBottom = '';
-  ctrl.style.overflow = '';
-  document.getElementById('hint-text').style.display = '';
-  fitCanvas();
-  updatePrompt();
-  drawAmida();
-});
-
-document.getElementById('back-to-start-btn').addEventListener('click', () => {
-  location.reload();
-});
-
-window.addEventListener('resize', () => {
-  if (document.getElementById('amida-wrap').style.display !== 'none') {
-    fitCanvas(); drawAmida();
-  }
-});
-
-// ===== インストール案内 =====
-(function() {
-  const banner = document.getElementById('install-banner');
-  const content = document.getElementById('install-content');
-
-  // アプリとして起動中なら何も表示しない
-  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
-
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  let deferredPrompt = null;
-  window._gameStarted = false;
-
-  function showTextGuide() {
-    if (window._gameStarted) return;
-    if (isIOS) {
-      content.innerHTML = '<div style="font-size:0.95rem;font-weight:900;color:#10ac84;margin-bottom:0.3rem;">📲 アプリとして使えるよ！</div>'
-        + '<div style="font-size:0.8rem;color:#6c5ce7;line-height:1.6;">下の <strong>共有ボタン（□↑）</strong>から<br><strong>「ホーム画面に追加」</strong>をタップしてね</div>';
-    } else {
-      content.innerHTML = '<div style="font-size:0.95rem;font-weight:900;color:#10ac84;margin-bottom:0.3rem;">📲 アプリとして使えるよ！</div>'
-        + '<div style="font-size:0.8rem;color:#6c5ce7;line-height:1.6;">ブラウザのメニュー（⋮）から<br><strong>「ホーム画面に追加」</strong>してね</div>';
-    }
-    banner.style.display = 'block';
-  }
-
-  if (isIOS) {
-    showTextGuide();
-  } else {
-    // Android / PC: インストールボタンを試みる
-    let prompted = false;
-    window.addEventListener('beforeinstallprompt', e => {
-      e.preventDefault();
-      deferredPrompt = e;
-      prompted = true;
-      if (window._gameStarted) return;
-      content.innerHTML = '<div style="font-size:0.95rem;font-weight:900;color:#10ac84;margin-bottom:0.5rem;">📲 アプリとして使えるよ！</div>'
-        + '<button id="install-btn" style="font-family:Zen Maru Gothic,sans-serif;font-weight:900;font-size:1rem;padding:10px 28px;border-radius:100px;border:none;cursor:pointer;background:linear-gradient(135deg,#10ac84,#54c7ec);color:white;box-shadow:0 4px 14px rgba(16,172,132,0.35);">インストール 🎉</button>';
-      banner.style.display = 'block';
-
-      document.getElementById('install-btn').addEventListener('click', () => {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(result => {
-          if (result.outcome === 'accepted') banner.style.display = 'none';
-          deferredPrompt = null;
+    <script>
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = item.getAttribute('href');
+                setTimeout(() => { location.href = url; }, 100);
+            });
         });
-      });
-    });
 
-    // beforeinstallpromptが来なかった場合、テキスト案内を表示
-    setTimeout(() => { if (!prompted) showTextGuide(); }, 2000);
+        (function installPrompt() {
+            const $banner  = document.getElementById('installBanner');
+            const $body    = document.getElementById('installBody');
+            const $actions = document.getElementById('installActions');
+            let deferredPrompt = null;
 
-    window.addEventListener('appinstalled', () => {
-      banner.style.display = 'none';
-    });
-  }
-})();
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js');
-}
-</script>
+            if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) return;
+            if (localStorage.getItem('install-dismissed')) return;
+
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+            function makeBtn(text, cls) {
+                const btn = document.createElement('button');
+                btn.textContent = text;
+                if (cls) btn.className = cls;
+                return btn;
+            }
+            function makeDismiss() {
+                const btn = makeBtn('あとで', 'ib-dismiss');
+                btn.addEventListener('click', () => {
+                    $banner.classList.remove('show');
+                    localStorage.setItem('install-dismissed', '1');
+                });
+                return btn;
+            }
+            function showIOSGuide() {
+                $body.innerHTML = '画面下の<strong>共有ボタン（□↑）</strong>をタップして<br><strong>「ホーム画面に追加」</strong>を選んでね！';
+                $actions.innerHTML = '';
+                $actions.appendChild(makeDismiss());
+                $banner.classList.add('show');
+            }
+            function showAndroidGuide() {
+                $body.innerHTML = 'ブラウザの<strong>メニュー（⋮）</strong>から<br><strong>「ホーム画面に追加」</strong>を選んでね！';
+                $actions.innerHTML = '';
+                $actions.appendChild(makeDismiss());
+                $banner.classList.add('show');
+            }
+            function showInstallButton() {
+                $body.innerHTML = 'アプリとしてインストールできるよ！';
+                $actions.innerHTML = '';
+                const btn = makeBtn('ホーム画面に追加');
+                btn.addEventListener('click', async () => {
+                    if (!deferredPrompt) return;
+                    deferredPrompt.prompt();
+                    const result = await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    if (result.outcome === 'accepted') $banner.classList.remove('show');
+                });
+                $actions.appendChild(makeDismiss());
+                $actions.appendChild(btn);
+                $banner.classList.add('show');
+            }
+            if (isIOS) {
+                setTimeout(showIOSGuide, 800);
+            } else {
+                let prompted = false;
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    prompted = true;
+                    showInstallButton();
+                });
+                setTimeout(() => { if (!prompted) showAndroidGuide(); }, 2500);
+            }
+            window.addEventListener('appinstalled', () => {
+                $banner.classList.remove('show');
+                localStorage.setItem('install-dismissed', '1');
+            });
+        })();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
+        }
+    </script>
 </body>
 </html>

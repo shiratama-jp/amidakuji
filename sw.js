@@ -1,8 +1,11 @@
-const CACHE_NAME = 'amidakuji-v13';
+const CACHE_NAME = 'kimeyo-rando-v1';
 const ASSETS = [
   './',
   './index.html',
+  './amida.html',
+  './animal_coin_toss.html',
   './manifest.json',
+  './qr20260416234205503.png',
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];

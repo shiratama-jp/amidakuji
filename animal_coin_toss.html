@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>どうぶつコイン表裏</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFF8F0;
+  --surface: #FFEFD5;
+  --card-bg: #FFE4C4;
+  --gold: #f5c842;
+  --gold-dark: #c8900a;
+  --silver: #c0c0c8;
+  --purple: #7b6ff0;
+  --purple-dark: #4a3fc0;
+  --text: #4A1B0C;
+  --text-muted: #7A4A2E;
+  --accent: #ff6b9d;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: var(--text);
+}
+
+.container {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  max-width: 420px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  font-size: 28px;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  white-space: nowrap;
+}
+
+/* 画面切り替え */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* モード選択画面 */
+.mode-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 300px;
+  margin: 2rem auto;
+}
+.mode-btn {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 20px;
+  border-radius: 16px;
+  border: 2px solid #F0997B;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F4FBF0 100%);
+  color: var(--text);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: all 0.15s;
+  box-shadow: 0 4px 12px rgba(240, 153, 123, 0.15);
+}
+.mode-btn:hover { 
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(240, 153, 123, 0.25);
+}
+.mode-btn:active { transform: scale(0.96); }
+
+/* キャラ選択画面 */
+.char-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  max-width: 320px;
+  margin: 2rem auto;
+}
+.char-option {
+  font-size: 48px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: white;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.char-option:hover { transform: scale(1.1); }
+.char-option.selected { 
+  border-color: #F0997B;
+  background: #FFF8F0;
+  transform: scale(1.05);
+}
+.char-option.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.round-selector {
+  margin: 2rem auto;
+  max-width: 300px;
+}
+.round-label {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.round-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.round-btn {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid #EAD9CC;
+  background: white;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.round-btn:hover { background: #FFF8F0; }
+.round-btn.selected {
+  border-color: #F0997B;
+  background: #FFF8F0;
+}
+
+.player-display {
+  margin: 0.5rem 0 1.5rem;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+}
+.player-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  padding: 12px;
+  border-radius: 16px;
+  transition: background 0.3s ease;
+}
+.player-box.active {
+  background: rgba(240, 153, 123, 0.15);
+  box-shadow: 0 0 0 2px rgba(240, 153, 123, 0.3);
+}
+.player-box.winner {
+  background: linear-gradient(135deg, rgba(245, 200, 66, 0.2), rgba(255, 215, 0, 0.15));
+  box-shadow: 0 0 0 3px rgba(245, 200, 66, 0.5);
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+.player-choice {
+  position: absolute;
+  font-size: 28px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.player-choice.show {
+  opacity: 1;
+}
+#player1-choice {
+  left: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+#player2-choice {
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+@keyframes sparkle {
+  0%, 100% { 
+    box-shadow: 0 0 0 3px rgba(245, 200, 66, 0.5),
+                0 0 20px rgba(245, 200, 66, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 0 3px rgba(245, 200, 66, 0.8),
+                0 0 30px rgba(245, 200, 66, 0.6),
+                0 0 40px rgba(245, 200, 66, 0.4);
+  }
+}
+.player-emoji {
+  font-size: 48px;
+}
+.player-name {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.player-score-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #F0997B;
+  color: white;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(240, 153, 123, 0.4);
+}
+
+/* ステージ */
+#stage {
+  width: 220px;
+  height: 220px;
+  position: relative;
+  margin: 0 auto 2rem;
+}
+#stage.with-players {
+  margin-top: 2rem;
+}
+#scene {
+  width: 220px;
+  height: 220px;
+  perspective: 500px;
+  position: absolute;
+  top: 0; left: 0;
+}
+#coin {
+  width: 220px;
+  height: 220px;
+  position: relative;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+#coin:hover {
+  transform: scale(1.05);
+}
+#coin.spinning {
+  cursor: default;
+  pointer-events: none;
+}
+.face {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  user-select: none;
+}
+#front {
+  background: radial-gradient(circle at 38% 32%, #fff5a0, #f5c842 30%, #c8900a 65%, #8a5f00 90%);
+  box-shadow:
+    inset 0 0 40px rgba(0,0,0,0.5),
+    inset 0 8px 20px rgba(255,255,180,0.6),
+    0 0 40px rgba(245,200,66,0.25);
+}
+#back {
+  background: radial-gradient(circle at 38% 32%, #f0f0f0, #c8c8d0 30%, #888898 65%, #505060 90%);
+  box-shadow:
+    inset 0 0 40px rgba(0,0,0,0.5),
+    inset 0 8px 20px rgba(255,255,255,0.5),
+    0 0 40px rgba(150,150,170,0.2);
+  transform: rotateX(180deg);
+}
+.coin-ring {
+  position: absolute;
+  width: 196px;
+  height: 196px;
+  border-radius: 50%;
+  border: 4px solid rgba(255,255,255,0.25);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.coin-inner-ring {
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.coin-label {
+  font-size: 90px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6));
+}
+
+/* カード */
+#card-wrap {
+  width: 280px;
+  height: 280px;
+  position: absolute;
+  top: -30px;
+  left: -30px;
+  perspective: 600px;
+  pointer-events: none;
+  opacity: 0;
+}
+#card {
+  width: 280px;
+  height: 280px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform-origin: center bottom;
+  transform: rotateX(-110deg);
+}
+.card-face {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border-radius: 28px;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.card-front-face {
+  background: linear-gradient(145deg, #F0997B, #F5C4B3);
+  box-shadow: 0 16px 48px rgba(240, 153, 123, 0.4), 0 0 0 1px rgba(245, 196, 179, 0.3);
+}
+.card-q {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 100px;
+  color: rgba(255,255,255,0.95);
+  line-height: 1;
+  text-shadow: 0 0 30px rgba(255,255,255,0.3);
+}
+.card-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.3em;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+/* 動物選択（ふたりモード） */
+.animal-choice {
+  margin: 2rem 0;
+}
+.choice-prompt {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+.animal-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+.animal-btn-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.animal-side-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+.animal-btn {
+  font-size: 64px;
+  padding: 20px;
+  border-radius: 16px;
+  border: 3px solid transparent;
+  background: white;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.animal-btn:hover {
+  transform: scale(1.1);
+  border-color: #F0997B;
+}
+.animal-btn:active { transform: scale(1.05); }
+
+/* 結果 */
+#result-text {
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  min-height: 50px;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+#sub-text {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 6px;
+  min-height: 28px;
+}
+
+/* ボタン */
+.btn-row {
+  margin-top: 1.8rem;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  min-height: 44px;
+}
+.btn {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 13px 36px;
+  border-radius: 100px;
+  border: 2px solid #F0997B;
+  background: white;
+  color: var(--text);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: all 0.15s;
+}
+.btn:hover { 
+  background: #FFF8F0;
+  transform: translateY(-2px);
+}
+.btn:active { transform: scale(0.96); }
+.btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+.btn-reveal {
+  background: linear-gradient(135deg, #F0997B, #F5C4B3);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 20px rgba(240, 153, 123, 0.3);
+}
+.btn-reveal:hover { 
+  box-shadow: 0 6px 28px rgba(240, 153, 123, 0.5);
+  background: linear-gradient(135deg, #E8845D, #F0997B);
+}
+
+/* スコア */
+#score-row {
+  margin-top: 2rem;
+  display: flex;
+  gap: 0;
+  justify-content: center;
+  background: white;
+  border-radius: 20px;
+  border: 2px solid #F5C4B3;
+  overflow: hidden;
+  min-height: 90px;
+}
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 28px;
+  gap: 4px;
+  flex: 1;
+  position: relative;
+}
+.score-item + .score-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  height: 60%;
+  width: 1px;
+  background: #F5C4B3;
+}
+.score-emoji {
+  font-size: 20px;
+  line-height: 1;
+  margin-right: 4px;
+}
+.score-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  line-height: 1;
+}
+.score-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+/* 最終結果画面 */
+.final-result {
+  margin: 2rem 0;
+}
+.final-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 300px;
+  margin: 2rem auto;
+}
+.final-score-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #F5C4B3;
+}
+.final-score-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.final-score-emoji {
+  font-size: 36px;
+}
+.final-score-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+.final-score-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  color: var(--text);
+}
+.winner-banner {
+  font-size: 28px;
+  font-weight: 900;
+  color: #F0997B;
+  margin-bottom: 1rem;
+  letter-spacing: 0.05em;
+}
+
+.back-btn {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: auto;
+  height: 44px;
+  padding: 0 16px;
+  background: #fff;
+  border: 3px solid #10ac84;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 16px;
+  font-weight: 900;
+  color: #10ac84;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  z-index: 1000;
+  text-decoration: none;
+  transition: transform 0.2s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.back-btn:active { transform: scale(0.9); }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-btn" id="backBtn">もどる</a>
+
+<div class="container">
+  <!-- モード選択画面 -->
+  <div class="screen active" id="mode-screen">
+    <h1>🐾 どうぶつコイン表裏</h1>
+    <p class="subtitle">どっちが出るかな？</p>
+    <div class="mode-buttons">
+      <button class="mode-btn" onclick="startMode('みんな')">みんなであそぶ</button>
+      <button class="mode-btn" onclick="startMode('ふたり')">対戦してあそぶ</button>
+    </div>
+  </div>
+
+  <!-- キャラ選択画面（ふたりモード用） -->
+  <div class="screen" id="char-screen">
+    <h1>プレイヤー選択</h1>
+    <p class="subtitle" id="char-prompt">プレイヤー1を選んでね</p>
+    <div class="char-grid" id="char-grid"></div>
+    <div class="round-selector" id="round-selector" style="display:none;">
+      <p class="round-label">何回勝負する？</p>
+      <div class="round-buttons">
+        <button class="round-btn" onclick="selectRounds(1)">①</button>
+        <button class="round-btn" onclick="selectRounds(2)">②</button>
+        <button class="round-btn" onclick="selectRounds(3)">③</button>
+        <button class="round-btn" onclick="selectRounds(4)">④</button>
+        <button class="round-btn" onclick="selectRounds(5)">⑤</button>
+      </div>
+    </div>
+    <div class="btn-row" id="char-btn-row" style="display:none;">
+      <button class="btn" onclick="startGame()">ゲーム開始！</button>
+    </div>
+  </div>
+
+  <!-- ゲーム画面 -->
+  <div class="screen" id="game-screen">
+    <h1>🐾 どうぶつコイン表裏</h1>
+    <p class="subtitle" id="game-subtitle">ゲーム中</p>
+
+    <!-- プレイヤー表示（ふたりモード時） -->
+    <div class="player-display" id="player-display" style="display:none;">
+      <div class="player-box" id="player1-box">
+        <div class="player-choice" id="player1-choice"></div>
+        <div class="player-emoji" id="player1-emoji"></div>
+        <div class="player-score-badge" id="player1-score-badge">0</div>
+        <div class="player-name">プレイヤー1</div>
+      </div>
+      <div style="font-size:24px;color:var(--text-muted);">VS</div>
+      <div class="player-box" id="player2-box">
+        <div class="player-choice" id="player2-choice"></div>
+        <div class="player-emoji" id="player2-emoji"></div>
+        <div class="player-score-badge" id="player2-score-badge">0</div>
+        <div class="player-name">プレイヤー2</div>
+      </div>
+    </div>
+
+    <!-- 動物選択プロンプト（ふたりモード時） -->
+    <div class="animal-choice" id="animal-choice" style="display:none;">
+      <div class="choice-prompt" id="choice-prompt"></div>
+      <div class="animal-buttons" id="animal-buttons"></div>
+    </div>
+
+    <div id="stage" style="display:none;">
+      <div id="scene">
+        <div id="coin">
+          <div class="face" id="front">
+            <div class="coin-ring"></div>
+            <div class="coin-inner-ring"></div>
+            <div class="coin-label" id="front-label">🐶</div>
+          </div>
+          <div class="face" id="back">
+            <div class="coin-ring" style="border-color:rgba(255,255,255,0.2)"></div>
+            <div class="coin-inner-ring"></div>
+            <div class="coin-label" id="back-label">🐱</div>
+          </div>
+        </div>
+      </div>
+      <div id="card-wrap">
+        <div id="card">
+          <div class="card-face card-front-face">
+            <div class="card-q">?</div>
+            <div class="card-sub">REVEAL</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="result-text"></div>
+    <div id="sub-text">タップして投げろ</div>
+
+    <div class="btn-row">
+      <button class="btn" id="toss-btn" onclick="toss()" style="display:none;">コイントス</button>
+      <button class="btn btn-reveal" id="reveal-btn" onclick="reveal()" style="display:none;">結果発表！</button>
+      <button class="btn" id="next-btn" onclick="nextRound()" style="display:none;">次のラウンド</button>
+    </div>
+
+    <div id="score-row">
+      <div class="score-item">
+        <div class="score-emoji" id="score-emoji-1" style="display:none;">🐶</div>
+        <span class="score-num" id="score-1">0</span>
+        <span class="score-label">おもて</span>
+      </div>
+      <div class="score-item">
+        <span class="score-num" id="total-count">0</span>
+        <span class="score-label">合計</span>
+      </div>
+      <div class="score-item">
+        <div class="score-emoji" id="score-emoji-2" style="display:none;">🐱</div>
+        <span class="score-num" id="score-2">0</span>
+        <span class="score-label">うら</span>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top: 1.5rem;">
+      <button class="btn" onclick="backToMode()">モード選択に戻る</button>
+    </div>
+  </div>
+
+  <!-- 最終結果画面（ふたりモード用） -->
+  <div class="screen" id="final-screen">
+    <div class="winner-banner" id="winner-banner"></div>
+    <div class="final-result">
+      <div class="final-scores">
+        <div class="final-score-item">
+          <div class="final-score-left">
+            <div class="final-score-emoji" id="final-player1-emoji"></div>
+            <div class="final-score-name">プレイヤー1</div>
+          </div>
+          <div class="final-score-num" id="final-player1-score">0</div>
+        </div>
+        <div class="final-score-item">
+          <div class="final-score-left">
+            <div class="final-score-emoji" id="final-player2-emoji"></div>
+            <div class="final-score-name">プレイヤー2</div>
+          </div>
+          <div class="final-score-num" id="final-player2-score">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="backToMode()">もう一度あそぶ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CHARS = ['🧙','🦸','🦹','🧚','🧛','🎅','👦','👧'];
+const ANIMALS = ['🐶','🐱','🐭','🐹','🐰','🐻','🐼','🐯','🦁','🐸','🐵','🐔','🐧','🐦','🦆','🐴','🐷','🐮'];
+
+let gameMode = null; // 'みんな' or 'ふたり'
+let player1Char = null;
+let player2Char = null;
+let totalRounds = 1;
+let currentRound = 0;
+let player1Score = 0;
+let player2Score = 0;
+let currentTurn = 1; // 1 or 2
+let player1Choice = null;
+let player2Choice = null;
+let currentAnimals = [];
+
+let animating = false;
+let rafId = null;
+let score1 = 0, score2 = 0;
+let pendingResult = null;
+
+const coin = document.getElementById('coin');
+const scene = document.getElementById('scene');
+const cardWrap = document.getElementById('card-wrap');
+const card = document.getElementById('card');
+const tossBtn = document.getElementById('toss-btn');
+const revealBtn = document.getElementById('reveal-btn');
+const nextBtn = document.getElementById('next-btn');
+const resultText = document.getElementById('result-text');
+const subText = document.getElementById('sub-text');
+const stage = document.getElementById('stage');
+
+function showScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+}
+
+function startMode(mode) {
+  gameMode = mode;
+  if (mode === 'みんな') {
+    resetGame();
+    showScreen('game-screen');
+    document.getElementById('player-display').style.display = 'none';
+    document.getElementById('animal-choice').style.display = 'none';
+    document.getElementById('stage').style.display = 'block';
+    document.getElementById('toss-btn').style.display = 'none';
+    document.getElementById('game-subtitle').textContent = 'みんなであそぶモード';
+    
+    // みんなモードではスコア絵文字を表示
+    document.getElementById('score-emoji-1').style.display = 'inline-block';
+    document.getElementById('score-emoji-2').style.display = 'inline-block';
+    
+    pickRandomAnimals();
+    
+    // コインをクリックでトス開始
+    coin.onclick = () => {
+      if (!animating) {
+        toss();
+      }
+    };
+    
+    // ゆっくり回転アニメーション開始
+    startIdleSpin();
+    subText.textContent = 'コインをタップ！';
+  } else {
+    showScreen('char-screen');
+    initCharSelection();
+  }
+}
+
+function initCharSelection() {
+  const grid = document.getElementById('char-grid');
+  grid.innerHTML = '';
+  CHARS.forEach(char => {
+    const btn = document.createElement('div');
+    btn.className = 'char-option';
+    btn.textContent = char;
+    btn.onclick = () => selectChar(char, btn);
+    grid.appendChild(btn);
+  });
+  document.getElementById('char-prompt').textContent = 'プレイヤー1を選んでね';
+  document.getElementById('round-selector').style.display = 'none';
+  document.getElementById('char-btn-row').style.display = 'none';
+}
+
+function selectChar(char, btn) {
+  if (btn.classList.contains('disabled')) return;
+  
+  if (!player1Char) {
+    player1Char = char;
+    btn.classList.add('selected', 'disabled');
+    document.getElementById('char-prompt').textContent = 'プレイヤー2を選んでね';
+  } else if (!player2Char && char !== player1Char) {
+    player2Char = char;
+    btn.classList.add('selected', 'disabled');
+    document.getElementById('round-selector').style.display = 'block';
+  }
+}
+
+function selectRounds(n) {
+  totalRounds = n;
+  document.querySelectorAll('.round-btn').forEach(b => b.classList.remove('selected'));
+  event.target.classList.add('selected');
+  document.getElementById('char-btn-row').style.display = 'block';
+}
+
+function startGame() {
+  resetGame();
+  currentRound = 1;
+  player1Score = 0;
+  player2Score = 0;
+  showScreen('game-screen');
+  document.getElementById('player-display').style.display = 'flex';
+  document.getElementById('player1-emoji').textContent = player1Char;
+  document.getElementById('player2-emoji').textContent = player2Char;
+  document.getElementById('player1-score-badge').textContent = '0';
+  document.getElementById('player2-score-badge').textContent = '0';
+  
+  // ふたりモードではスコア絵文字を非表示
+  document.getElementById('score-emoji-1').style.display = 'none';
+  document.getElementById('score-emoji-2').style.display = 'none';
+  
+  document.getElementById('animal-choice').style.display = 'block';
+  document.getElementById('stage').style.display = 'none';
+  document.getElementById('toss-btn').style.display = 'none';
+  document.getElementById('game-subtitle').textContent = `ラウンド ${currentRound} / ${totalRounds}`;
+  
+  pickRandomAnimals();
+  promptPlayerChoice();
+}
+
+function pickRandomAnimals() {
+  const shuffled = [...ANIMALS].sort(() => Math.random() - 0.5);
+  currentAnimals = [shuffled[0], shuffled[1]];
+  document.getElementById('front-label').textContent = currentAnimals[0];
+  document.getElementById('back-label').textContent = currentAnimals[1];
+  
+  // みんなモードの場合のみスコア絵文字を更新
+  if (gameMode === 'みんな') {
+    document.getElementById('score-emoji-1').textContent = currentAnimals[0];
+    document.getElementById('score-emoji-2').textContent = currentAnimals[1];
+  }
+}
+
+function promptPlayerChoice() {
+  const currentPlayer = (currentRound % 2 === 1) ? 1 : 2;
+  currentTurn = currentPlayer;
+  const playerEmoji = currentPlayer === 1 ? player1Char : player2Char;
+  
+  // プレイヤーボックスのハイライト
+  document.getElementById('player1-box').classList.remove('active');
+  document.getElementById('player2-box').classList.remove('active');
+  if (currentPlayer === 1) {
+    document.getElementById('player1-box').classList.add('active');
+  } else {
+    document.getElementById('player2-box').classList.add('active');
+  }
+  
+  document.getElementById('choice-prompt').textContent = `${playerEmoji}さん選んでください`;
+  
+  const btnContainer = document.getElementById('animal-buttons');
+  btnContainer.innerHTML = '';
+  
+  currentAnimals.forEach((animal, index) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'animal-btn-wrapper';
+    
+    const label = document.createElement('div');
+    label.className = 'animal-side-label';
+    label.textContent = index === 0 ? 'おもて' : 'うら';
+    
+    const btn = document.createElement('div');
+    btn.className = 'animal-btn';
+    btn.textContent = animal;
+    btn.onclick = () => chooseAnimal(animal);
+    
+    wrapper.appendChild(label);
+    wrapper.appendChild(btn);
+    btnContainer.appendChild(wrapper);
+  });
+}
+
+function chooseAnimal(animal) {
+  if (currentTurn === 1) {
+    player1Choice = animal;
+    player2Choice = currentAnimals.find(a => a !== animal);
+  } else {
+    player2Choice = animal;
+    player1Choice = currentAnimals.find(a => a !== animal);
+  }
+  
+  // 選択した動物を表示
+  document.getElementById('player1-choice').textContent = player1Choice;
+  document.getElementById('player2-choice').textContent = player2Choice;
+  document.getElementById('player1-choice').classList.add('show');
+  document.getElementById('player2-choice').classList.add('show');
+  
+  // ハイライト解除
+  document.getElementById('player1-box').classList.remove('active');
+  document.getElementById('player2-box').classList.remove('active');
+  
+  document.getElementById('animal-choice').style.display = 'none';
+  const stageEl = document.getElementById('stage');
+  stageEl.style.display = 'block';
+  stageEl.classList.add('with-players');
+  
+  // コインをクリックでトス開始
+  coin.onclick = () => {
+    if (!animating) {
+      toss();
+    }
+  };
+  
+  // ゆっくり回転アニメーション開始
+  startIdleSpin();
+  
+  subText.textContent = 'コインをタップ！';
+}
+
+let idleSpinId = null;
+
+// 効果音生成
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTossSound() {
+  // ぽよぽよぽよ（バウンド音）
+  const duration = 0.08;
+  const pitches = [300, 350, 280, 320, 260]; // ランダムな高さ
+  
+  pitches.forEach((pitch, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.value = pitch;
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.12);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.12 + duration);
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.start(audioCtx.currentTime + i * 0.12);
+    osc.stop(audioCtx.currentTime + i * 0.12 + duration);
+  });
+}
+
+function playCoverSound() {
+  // バタン（カードがかぶさる音）
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.15);
+  
+  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+  
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.15);
+}
+
+function playRevealSound() {
+  // てってれー（ファンファーレ風）
+  const notes = [
+    { freq: 523.25, time: 0 },      // ド
+    { freq: 659.25, time: 0.15 },   // ミ
+    { freq: 783.99, time: 0.3 }     // ソ
+  ];
+  
+  notes.forEach(note => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.type = 'square';
+    osc.frequency.value = note.freq;
+    
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime + note.time);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + note.time + 0.3);
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.start(audioCtx.currentTime + note.time);
+    osc.stop(audioCtx.currentTime + note.time + 0.3);
+  });
+}
+
+function startIdleSpin() {
+  let angle = 0;
+  function spinIdle() {
+    if (!animating) {
+      angle += 0.5;
+      coin.style.transition = 'none';
+      coin.style.transform = `rotateX(${angle}deg)`;
+      idleSpinId = requestAnimationFrame(spinIdle);
+    }
+  }
+  spinIdle();
+}
+
+function stopIdleSpin() {
+  if (idleSpinId) {
+    cancelAnimationFrame(idleSpinId);
+    idleSpinId = null;
+  }
+}
+
+function resetGame() {
+  score1 = 0;
+  score2 = 0;
+  document.getElementById('score-1').textContent = '0';
+  document.getElementById('score-2').textContent = '0';
+  document.getElementById('total-count').textContent = '0';
+  resultText.style.opacity = '0';
+  resultText.textContent = '';
+  subText.textContent = '';
+  
+  coin.style.transition = 'none';
+  coin.style.transform = 'rotateX(0deg)';
+  scene.style.transition = 'none';
+  scene.style.transform = 'translateY(0px)';
+  cardWrap.style.opacity = '0';
+  card.style.transition = 'none';
+  card.style.transform = 'rotateX(-110deg)';
+}
+
+function toss() {
+  if (animating) return;
+  animating = true;
+  stopIdleSpin();
+  coin.classList.add('spinning');
+  tossBtn.disabled = true;
+  tossBtn.style.display = 'none';
+  revealBtn.style.display = 'none';
+  nextBtn.style.display = 'none';
+  resultText.style.opacity = '0';
+  subText.textContent = '...';
+  cardWrap.style.opacity = '0';
+  card.style.transition = 'none';
+  card.style.transform = 'rotateX(-110deg)';
+
+  // トス音を再生
+  playTossSound();
+
+  pendingResult = Math.random() < 0.5;
+
+  const spinDuration = 2000 + Math.random() * 600;
+  const spinSpeed = 1.8;
+  let startTime = null;
+
+  const bounceH = 170 + Math.floor(Math.random() * 50);
+  scene.style.transition = 'none';
+  scene.style.transform = 'translateY(0px)';
+
+  requestAnimationFrame(() => {
+    scene.style.transition = `transform ${spinDuration * 0.42}ms cubic-bezier(0.2, 0, 0.4, 1)`;
+    scene.style.transform = `translateY(-${bounceH}px)`;
+    setTimeout(() => {
+      scene.style.transition = `transform ${spinDuration * 0.58}ms cubic-bezier(0.5, 0, 0.8, 1)`;
+      scene.style.transform = 'translateY(0px)';
+    }, spinDuration * 0.42);
+  });
+
+  function spinFrame(ts) {
+    if (!startTime) startTime = ts;
+    const elapsed = ts - startTime;
+    coin.style.transform = `rotateX(${elapsed * spinSpeed}deg)`;
+    if (elapsed < spinDuration) {
+      rafId = requestAnimationFrame(spinFrame);
+    } else {
+      coverWithCard();
+    }
+  }
+  rafId = requestAnimationFrame(spinFrame);
+}
+
+function coverWithCard() {
+  // カバー音を再生
+  playCoverSound();
+  
+  cardWrap.style.opacity = '1';
+  card.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.3, 0.64, 1)';
+  card.style.transform = 'rotateX(0deg)';
+  subText.textContent = 'さあ、どっち？';
+  
+  // コインクリックを無効化
+  coin.onclick = null;
+
+  setTimeout(() => {
+    coin.style.transition = 'none';
+    coin.style.transform = pendingResult ? 'rotateX(0deg)' : 'rotateX(180deg)';
+  }, 350);
+
+  setTimeout(() => {
+    animating = false;
+    coin.classList.remove('spinning');
+    tossBtn.disabled = false;
+    revealBtn.style.display = 'inline-block';
+  }, 320);
+}
+
+function reveal() {
+  revealBtn.disabled = true;
+  subText.textContent = '...';
+
+  card.style.transition = 'transform 0.45s cubic-bezier(0.6, 0, 0.8, 1)';
+  card.style.transform = 'rotateX(-110deg)';
+
+  setTimeout(() => {
+    cardWrap.style.opacity = '0';
+    revealBtn.style.display = 'none';
+    
+    // 結果発表音を再生
+    playRevealSound();
+
+    const winner = pendingResult ? currentAnimals[0] : currentAnimals[1];
+    
+    if (pendingResult) {
+      score1++;
+    } else {
+      score2++;
+    }
+    
+    resultText.textContent = `${winner}が出た！`;
+    resultText.style.color = '#F0997B';
+    resultText.style.opacity = '1';
+    
+    // ふたりモードでスコア計算
+    if (gameMode === 'ふたり') {
+      // キラキラ演出をクリア
+      document.getElementById('player1-box').classList.remove('winner');
+      document.getElementById('player2-box').classList.remove('winner');
+      
+      if (winner === player1Choice) {
+        player1Score++;
+        document.getElementById('player1-score-badge').textContent = player1Score;
+        subText.textContent = `${player1Char}さんの勝ち！`;
+        // 勝者にキラキラ演出
+        document.getElementById('player1-box').classList.add('winner');
+      } else {
+        player2Score++;
+        document.getElementById('player2-score-badge').textContent = player2Score;
+        subText.textContent = `${player2Char}さんの勝ち！`;
+        // 勝者にキラキラ演出
+        document.getElementById('player2-box').classList.add('winner');
+      }
+    } else {
+      subText.textContent = 'もう一度？';
+    }
+
+    revealBtn.disabled = false;
+
+    document.getElementById('score-1').textContent = score1;
+    document.getElementById('score-2').textContent = score2;
+    document.getElementById('total-count').textContent = score1 + score2;
+    
+    if (gameMode === 'ふたり') {
+      if (currentRound < totalRounds) {
+        nextBtn.style.display = 'inline-block';
+      } else {
+        setTimeout(() => showFinalResult(), 2000);
+      }
+    } else {
+      // みんなモードでは結果表示後もタップ可能に
+      coin.onclick = () => {
+        if (!animating) {
+          toss();
+        }
+      };
+      subText.textContent = 'もう一度？';
+    }
+  }, 420);
+}
+
+function nextRound() {
+  currentRound++;
+  document.getElementById('game-subtitle').textContent = `ラウンド ${currentRound} / ${totalRounds}`;
+  
+  // キラキラ演出をクリア
+  document.getElementById('player1-box').classList.remove('winner');
+  document.getElementById('player2-box').classList.remove('winner');
+  
+  // 選択動物表示をクリア
+  document.getElementById('player1-choice').classList.remove('show');
+  document.getElementById('player2-choice').classList.remove('show');
+  
+  nextBtn.style.display = 'none';
+  const stageEl = document.getElementById('stage');
+  stageEl.style.display = 'none';
+  stageEl.classList.remove('with-players');
+  document.getElementById('animal-choice').style.display = 'block';
+  resultText.style.opacity = '0';
+  subText.textContent = '';
+  
+  // アイドル回転を停止
+  stopIdleSpin();
+  
+  pickRandomAnimals();
+  promptPlayerChoice();
+  
+  // コインをリセット
+  coin.style.transition = 'none';
+  coin.style.transform = 'rotateX(0deg)';
+  scene.style.transform = 'translateY(0px)';
+  cardWrap.style.opacity = '0';
+  card.style.transform = 'rotateX(-110deg)';
+}
+
+function showFinalResult() {
+  showScreen('final-screen');
+  document.getElementById('final-player1-emoji').textContent = player1Char;
+  document.getElementById('final-player2-emoji').textContent = player2Char;
+  document.getElementById('final-player1-score').textContent = player1Score;
+  document.getElementById('final-player2-score').textContent = player2Score;
+  
+  if (player1Score > player2Score) {
+    document.getElementById('winner-banner').textContent = `🎉 ${player1Char}さんの勝ち！`;
+  } else if (player2Score > player1Score) {
+    document.getElementById('winner-banner').textContent = `🎉 ${player2Char}さんの勝ち！`;
+  } else {
+    document.getElementById('winner-banner').textContent = '🤝 引き分け！';
+  }
+}
+
+function backToMode() {
+  player1Char = null;
+  player2Char = null;
+  totalRounds = 1;
+  currentRound = 0;
+  player1Score = 0;
+  player2Score = 0;
+  player1Choice = null;
+  player2Choice = null;
+  gameMode = null;
+  stopIdleSpin();
+  coin.onclick = null;
+  nextBtn.style.display = 'none';
+  resetGame();
+  showScreen('mode-screen');
+}
+
+document.getElementById('backBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  if (history.length > 1) {
+    history.back();
+  } else {
+    location.replace('index.html');
+  }
+});
+</script>
+</body>
+</html>
